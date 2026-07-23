@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CampusGrid — Tiled Poster Set (12× A4)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+  :root{
+    --navy-1:#0a1628;
+    --cyan:#2fd8f5;
+    --amber:#f5a623;
+    --paper:#e9e6dc;
+    --line:#2fd8f555;
+    --line-strong:#2fd8f5aa;
+
+    /* print geometry */
+    --page-w:210mm;
+    --page-h:297mm;
+    --margin:12mm;              /* "normal" print margin */
+    --win-w:186mm;              /* page-w - 2*margin */
+    --win-h:273mm;              /* page-h - 2*margin */
+    --master-w:372mm;           /* win-w * 2 (2x2 grid) */
+    --master-h:546mm;           /* win-h * 2 */
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#3a3a3a;font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- on-screen only instructions ---------- */
+  .no-print{max-width:800px;margin:24px auto;background:#1c1c1c;color:#dcd8ce;padding:22px 26px;border:1px solid #444;font-size:13px;line-height:1.7;}
+  .no-print h2{color:var(--cyan);font-size:15px;letter-spacing:1px;margin:0 0 10px;}
+  .no-print b{color:var(--amber);}
+  .no-print .grid-key{display:inline-block;background:#111;padding:2px 6px;border:1px solid #555;margin:0 2px;font-size:11px;}
+
+  /* ---------- poster group wrapper (screen: stacked, print: paginated) ---------- */
+  .poster-group{max-width:800px;margin:0 auto 40px;}
+  .group-title{color:#9fb0c2;font-size:12px;letter-spacing:2px;text-align:center;margin:18px 0 10px;text-transform:uppercase;}
+
+  /* ---------- physical page ---------- */
+  .page{
+    width:var(--page-w);
+    height:var(--page-h);
+    background:#fff;
+    position:relative;
+    margin:0 auto 14px;
+    overflow:hidden;
+    box-shadow:0 6px 24px rgba(0,0,0,.5);
+  }
+
+  /* trim window: exactly the printable area, centered by the margin */
+  .window{
+    position:absolute;
+    top:var(--margin); left:var(--margin);
+    width:var(--win-w); height:var(--win-h);
+    overflow:hidden;
+    background:var(--navy-1);
+  }
+  .window > .master-clone{
+    position:absolute; top:0; left:0;
+    width:var(--master-w); height:var(--master-h);
+  }
+
+  /* crop marks — sit in the margin, right at the trim corners */
+  .crop{position:absolute; width:6mm; height:6mm; pointer-events:none;}
+  .crop i{position:absolute; background:#000; display:block;}
+  .crop .h{width:6mm; height:.25mm; top:0;}
+  .crop .v{width:.25mm; height:6mm; left:0;}
+  .crop.tl{top:calc(var(--margin) - 6mm); left:calc(var(--margin) - 6mm);}
+  .crop.tl .h{top:6mm; left:0;} .crop.tl .v{top:0; left:6mm;}
+  .crop.tr{top:calc(var(--margin) - 6mm); right:calc(var(--margin) - 6mm);}
+  .crop.tr .h{top:6mm; right:0;} .crop.tr .v{top:0; right:6mm;}
+  .crop.bl{bottom:calc(var(--margin) - 6mm); left:calc(var(--margin) - 6mm);}
+  .crop.bl .h{bottom:6mm; left:0;} .crop.bl .v{bottom:0; left:6mm;}
+  .crop.br{bottom:calc(var(--margin) - 6mm); right:calc(var(--margin) - 6mm);}
+  .crop.br .h{bottom:6mm; right:0;} .crop.br .v{bottom:0; right:6mm;}
+
+  .tile-label{
+    position:absolute; bottom:2.5mm; left:var(--margin); right:var(--margin);
+    font-size:2.4mm; letter-spacing:.3mm; color:#888; text-align:center;
+  }
+  .tile-label b{color:#555;}
+
+  /* ---------- shared design tokens (used inside <template> masters) ---------- */
+  .m-crest{width:14mm;height:14mm;}
+  .m-header{position:absolute; top:10mm; left:10mm; right:10mm; display:flex; align-items:center; justify-content:space-between;}
+  .m-kmkk{display:flex; align-items:center; gap:4mm;}
+  .m-kmkk-text{display:flex; flex-direction:column; line-height:1;}
+  .m-kmkk-text .k1{font-weight:800; font-size:6mm; letter-spacing:1.6mm; color:var(--paper);}
+  .m-kmkk-text .k2{font-size:2.1mm; letter-spacing:.6mm; color:var(--cyan); margin-top:1.4mm; text-transform:uppercase;}
+  .m-doctag{text-align:right; font-size:2.3mm; letter-spacing:.4mm; color:var(--cyan); line-height:1.8; text-transform:uppercase;}
+  .m-doctag b{color:var(--amber);}
+  .m-rule{position:absolute; left:10mm; right:10mm; top:28mm; height:.25mm; background:var(--line-strong);}
+  .m-eyebrow{position:absolute; left:10mm; font-size:2.9mm; letter-spacing:1.3mm; color:var(--amber); text-transform:uppercase;}
+  .m-h1{position:absolute; left:10mm; margin:0; color:var(--paper); font-weight:800; letter-spacing:.2mm; line-height:1.02;}
+  .m-h1 span{color:var(--cyan);}
+  .m-tagline{position:absolute; left:10mm; font-size:3.6mm; letter-spacing:.15mm; color:#b9c4d4; line-height:1.6;}
+  .m-titleblock{position:absolute; left:10mm; right:10mm; bottom:10mm; border-top:.25mm solid var(--line-strong); padding-top:3.5mm; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; font-size:2.2mm; letter-spacing:.3mm; color:#8fa3ba; text-transform:uppercase;}
+  .m-titleblock .cell{border-left:.25mm solid var(--line); padding:0 4mm;}
+  .m-titleblock .cell:first-child{border-left:none; padding-left:0;}
+  .m-titleblock .cell b{display:block; color:var(--paper); font-size:3mm; margin-top:1mm; text-transform:none;}
+  .m-grid-bg{position:absolute; inset:0; background-image:linear-gradient(var(--line) .2mm,transparent .2mm),linear-gradient(90deg,var(--line) .2mm,transparent .2mm); background-size:9mm 9mm; opacity:.3;}
+  .m-node{position:absolute; width:90mm; border:.3mm solid var(--cyan); background:rgba(47,216,245,.05); padding:4mm;}
+  .m-node .num{font-size:2.6mm; color:var(--amber); letter-spacing:.6mm; margin-bottom:1.5mm; display:block;}
+  .m-node .name{font-weight:700; font-size:4.4mm; letter-spacing:.3mm; color:var(--cyan);}
+  .m-node .desc{margin-top:1.8mm; color:#a9b8ca; font-size:2.8mm; line-height:1.4;}
+  .m-hub{position:absolute; width:70mm; height:70mm; border-radius:50%; border:.4mm solid var(--amber); display:flex; align-items:center; justify-content:center; text-align:center; font-size:2.9mm; letter-spacing:.4mm; color:var(--amber); background:var(--navy-1);}
+  .m-hub b{display:block; font-size:4.2mm; color:var(--paper); letter-spacing:.3mm; margin-bottom:1.2mm;}
+  .m-waypoint{position:absolute; width:3mm; height:3mm; border:.3mm solid var(--amber); background:var(--navy-1);}
+  .m-waypoint::after{content:'';position:absolute; inset:.9mm; background:var(--amber);}
+  .m-pathlabel{position:absolute; font-size:2.6mm; letter-spacing:.4mm; color:var(--cyan);}
+  .m-dim{position:absolute; font-size:2.3mm; color:#8fa3ba; letter-spacing:.3mm;}
+  .m-stat{position:absolute; border:.25mm solid var(--line-strong); padding:4mm 6mm; min-width:44mm;}
+  .m-stat .num{font-size:8mm; font-weight:800; color:var(--cyan);}
+  .m-stat .label{font-size:2.3mm; letter-spacing:.4mm; color:#a9b8ca; margin-top:1mm; text-transform:uppercase;}
+  .m-ring{position:absolute; border-radius:50%; border:.3mm solid var(--cyan); opacity:.4;}
+  .m-readout{position:absolute; border:.25mm solid var(--line-strong); background:rgba(47,216,245,.05); padding:3.5mm 4.5mm;}
+  .m-readout .label{font-size:2.2mm; color:var(--amber); letter-spacing:.5mm; text-transform:uppercase;}
+  .m-readout .val{font-size:5.5mm; color:var(--paper); font-weight:700; margin-top:1.2mm; line-height:1.15;}
+  .m-bar{position:absolute; width:3.4mm; background:var(--cyan); opacity:.75;}
+
+  @media print{
+    .no-print, .group-title{display:none !important;}
+    body{background:#fff;}
+    .poster-group{margin:0;max-width:none;}
+    .page{margin:0; box-shadow:none; page-break-after:always;}
+    .page:last-child{page-break-after:auto;}
+  }
+  @page{ size:A4; margin:0; }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <h2>How this prints as one seamless poster</h2>
+  Each of the 3 posters below is split into <b>4 A4 sheets</b> (a 2×2 grid) — 12 sheets total.
+  Print at <b>100% scale, no "fit to page"</b>. Every sheet has a <b>12mm margin</b> on all sides —
+  cut each sheet along its four corner crop marks to remove that margin, then tape the trimmed
+  edges together in this arrangement:
+  <br><br>
+  <span class="grid-key">R1·C1</span><span class="grid-key">R1·C2</span><br>
+  <span class="grid-key">R2·C1</span><span class="grid-key">R2·C2</span>
+  <br><br>
+  Each assembled poster comes out to roughly <b>37cm × 55cm</b>. The small gray label at the
+  bottom of each sheet is inside the margin and gets trimmed away — it's only there to help you
+  keep the sheets in order.
+</div>
+
+<!-- ============================================================ -->
+<!-- MASTER TEMPLATES — one full design per poster, tiled at print -->
+<!-- ============================================================ -->
+
+<template id="master1">
+<div class="m-grid-bg"></div>
+<div class="m-header">
+  <div class="m-kmkk">
+    <svg class="m-crest" viewBox="0 0 52 52">
+      <polygon points="26,2 48,13 48,32 26,50 4,32 4,13" fill="none" stroke="#2fd8f5" stroke-width="1.4"/>
+      <polygon points="26,9 42,17 42,30 26,43 10,30 10,17" fill="none" stroke="#f5a623" stroke-width="1"/>
+      <text x="26" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="800" fill="#e9e6dc">KMKK</text>
+    </svg>
+    <div class="m-kmkk-text">
+      <span class="k1">KMKK</span>
+      <span class="k2">Kolej Matrikulasi Kejuruteraan Kedah</span>
+    </div>
+  </div>
+  <div class="m-doctag">INNOVATION CHALLENGE 2026<br>SUBMISSION&nbsp;/&nbsp;<b>CAMPUSGRID</b></div>
+</div>
+<div class="m-rule"></div>
+
+<div class="m-eyebrow" style="top:36mm;">Smart Campus Directory &amp; Navigation Platform</div>
+<h1 class="m-h1" style="top:42mm; font-size:26mm;">Campus<span>Grid</span></h1>
+<div class="m-tagline" style="top:78mm; max-width:230mm;">
+  Six systems, one grid. A living map of the campus that finds the room, tracks the shuttle,
+  and flags the shortest accessible route — before you ask twice.
+</div>
+
+<svg style="position:absolute; top:0; left:0; width:372mm; height:546mm;" viewBox="0 0 372 546">
+  <g stroke="#2fd8f5" stroke-width=".5" opacity=".55" fill="none">
+    <line x1="186" y1="330" x2="186" y2="190"/>
+    <line x1="186" y1="330" x2="307" y2="260"/>
+    <line x1="186" y1="330" x2="307" y2="400"/>
+    <line x1="186" y1="330" x2="186" y2="470"/>
+    <line x1="186" y1="330" x2="65" y2="400"/>
+    <line x1="186" y1="330" x2="65" y2="260"/>
+  </g>
+</svg>
+
+<div class="m-hub" style="left:151mm; top:295mm;"><div><b>GRID</b>CORE ENGINE</div></div>
+
+<div class="m-node" style="left:141mm; top:160mm;"><span class="num">01 / NAV</span><div class="name">Navigation</div><div class="desc">Turn-by-turn routing between any two points on campus.</div></div>
+<div class="m-node" style="left:262mm; top:230mm;"><span class="num">03 / AI</span><div class="name">AI Assistant</div><div class="desc">Ask it in plain language. It answers with a route.</div></div>
+<div class="m-node" style="left:262mm; top:370mm;"><span class="num">05 / RTD</span><div class="name">Real-Time Data</div><div class="desc">Live occupancy, shuttle position, and event changes.</div></div>
+<div class="m-node" style="left:141mm; top:440mm;"><span class="num">02 / DIR</span><div class="name">Directory</div><div class="desc">Every room, staff member, and department, searchable.</div></div>
+<div class="m-node" style="left:20mm; top:370mm;"><span class="num">06 / SUS</span><div class="name">Sustainability</div><div class="desc">Routes that favour walking and shared transport.</div></div>
+<div class="m-node" style="left:20mm; top:230mm;"><span class="num">04 / ACC</span><div class="name">Accessibility</div><div class="desc">Step-free paths flagged and prioritised by default.</div></div>
+
+<div class="m-titleblock">
+  <div class="cell">SHEET<b>01 / 03</b></div>
+  <div class="cell">SCALE<b>1 : 1 CAMPUS</b></div>
+  <div class="cell">DRAWN BY<b>SATH · TEAM CAMPUSGRID</b></div>
+  <div class="cell">STATUS<b>PITCH — KMKK 2026</b></div>
+</div>
+</template>
+
+<template id="master2">
+<div class="m-grid-bg"></div>
+<div class="m-header">
+  <div class="m-kmkk">
+    <svg class="m-crest" viewBox="0 0 52 52">
+      <polygon points="26,2 48,13 48,32 26,50 4,32 4,13" fill="none" stroke="#2fd8f5" stroke-width="1.4"/>
+      <polygon points="26,9 42,17 42,30 26,43 10,30 10,17" fill="none" stroke="#f5a623" stroke-width="1"/>
+      <text x="26" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="800" fill="#e9e6dc">KMKK</text>
+    </svg>
+    <div class="m-kmkk-text">
+      <span class="k1">KMKK</span>
+      <span class="k2">Kolej Matrikulasi Kejuruteraan Kedah</span>
+    </div>
+  </div>
+  <div class="m-doctag">ROUTE MODULE<br>NAVIGATION&nbsp;/&nbsp;<b>ACCESSIBILITY</b></div>
+</div>
+<div class="m-rule"></div>
+
+<div class="m-eyebrow" style="top:36mm;">Pillar 01 &amp; 04</div>
+<h1 class="m-h1" style="top:42mm; font-size:19mm;">Navigate<br>Any <span>Corner</span></h1>
+<div class="m-tagline" style="top:100mm; max-width:200mm;">
+  No campus is fully flat, fully lit, or fully signed. CampusGrid routes around that — every
+  path checked for stairs, distance, and time of day.
+</div>
+
+<svg style="position:absolute; top:0; left:0; width:372mm; height:546mm;" viewBox="0 0 372 546">
+  <path d="M 50 470 L 50 350 L 300 350 L 300 180" stroke="#2fd8f5" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+  <path d="M 50 470 L 130 470 L 130 260 L 300 260 L 300 180" stroke="#8fa3ba" stroke-width=".5" fill="none" opacity=".4"/>
+</svg>
+
+<div class="m-waypoint" style="left:47mm; top:467mm;"></div>
+<div class="m-pathlabel" style="left:20mm; top:478mm;">A · LECTURE HALL 2</div>
+
+<div class="m-waypoint" style="left:297mm; top:177mm;"></div>
+<div class="m-pathlabel" style="left:255mm; top:165mm;">B · LIBRARY WING</div>
+
+<div class="m-waypoint" style="left:47mm; top:347mm;"></div>
+<div class="m-dim" style="left:53mm; top:340mm;">RAMP ACCESS — NO STAIRS</div>
+
+<div class="m-waypoint" style="left:297mm; top:347mm;"></div>
+<div class="m-dim" style="left:253mm; top:355mm;">COVERED WALKWAY</div>
+
+<div class="m-dim" style="left:120mm; top:340mm;">240m · 4 MIN WALK</div>
+<div class="m-dim" style="left:150mm; top:250mm;">— ALT. ROUTE, STAIRS ONLY —</div>
+
+<div class="m-stat" style="left:10mm; top:500mm;"><div class="num">3</div><div class="label">Routes Compared</div></div>
+<div class="m-stat" style="left:140mm; top:500mm;"><div class="num">0</div><div class="label">Stairs on Chosen Path</div></div>
+<div class="m-stat" style="left:270mm; top:500mm;"><div class="num">4m</div><div class="label">Est. Walk Time</div></div>
+
+<div class="m-titleblock" style="display:none;"></div>
+</template>
+
+<template id="master3">
+<div class="m-grid-bg"></div>
+<div class="m-header">
+  <div class="m-kmkk">
+    <svg class="m-crest" viewBox="0 0 52 52">
+      <polygon points="26,2 48,13 48,32 26,50 4,32 4,13" fill="none" stroke="#2fd8f5" stroke-width="1.4"/>
+      <polygon points="26,9 42,17 42,30 26,43 10,30 10,17" fill="none" stroke="#f5a623" stroke-width="1"/>
+      <text x="26" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="800" fill="#e9e6dc">KMKK</text>
+    </svg>
+    <div class="m-kmkk-text">
+      <span class="k1">KMKK</span>
+      <span class="k2">Kolej Matrikulasi Kejuruteraan Kedah</span>
+    </div>
+  </div>
+  <div class="m-doctag">INTELLIGENCE MODULE<br>AI&nbsp;/&nbsp;DATA&nbsp;/&nbsp;<b>SUSTAINABILITY</b></div>
+</div>
+<div class="m-rule"></div>
+
+<div class="m-eyebrow" style="top:36mm;">Pillar 03, 05 &amp; 06</div>
+<h1 class="m-h1" style="top:42mm; font-size:19mm;">Live,<br>Learning,<br><span>Low-Impact</span></h1>
+<div class="m-tagline" style="top:150mm; max-width:160mm;">
+  The assistant answers in plain language. The data behind it updates in real time. The routes
+  it prefers cut down on unnecessary transport.
+</div>
+
+<div class="m-ring" style="width:100mm; height:100mm; left:230mm; top:230mm;"></div>
+<div class="m-ring" style="width:150mm; height:150mm; left:205mm; top:205mm;"></div>
+<div class="m-ring" style="width:200mm; height:200mm; left:180mm; top:180mm;"></div>
+
+<div class="m-readout" style="left:205mm; top:170mm; width:65mm;"><div class="label">Ask CampusGrid</div><div class="val">"Where's the shuttle?"</div></div>
+<div class="m-readout" style="left:290mm; top:250mm; width:56mm;"><div class="label">Shuttle ETA</div><div class="val">6 min</div></div>
+<div class="m-readout" style="left:290mm; top:320mm; width:56mm;"><div class="label">Hall Occupancy</div><div class="val">62%</div></div>
+
+<div style="position:absolute; left:20mm; top:420mm; width:150mm; height:40mm;">
+  <div class="m-bar" style="left:0mm; bottom:0; height:40%;"></div>
+  <div class="m-bar" style="left:8mm; bottom:0; height:65%; background:#f5a623;"></div>
+  <div class="m-bar" style="left:16mm; bottom:0; height:90%;"></div>
+  <div class="m-bar" style="left:24mm; bottom:0; height:55%;"></div>
+  <div class="m-bar" style="left:32mm; bottom:0; height:75%;"></div>
+</div>
+<div class="m-dim" style="left:20mm; top:465mm; max-width:150mm;">WALK / SHARED-TRANSPORT ROUTES CHOSEN THIS WEEK</div>
+
+<div class="m-titleblock">
+  <div class="cell">SHEET<b>03 / 03</b></div>
+  <div class="cell">SCALE<b>N/A — LIVE DATA</b></div>
+  <div class="cell">DRAWN BY<b>SATH · TEAM CAMPUSGRID</b></div>
+  <div class="cell">STATUS<b>PITCH — KMKK 2026</b></div>
+</div>
+</template>
+
+<!-- ============================================================ -->
+<!-- Poster groups get built into 4 tiled A4 pages each via JS     -->
+<!-- ============================================================ -->
+<div id="root"></div>
+
+<script>
+  const posters = [
+    { master:'master1', name:'Poster 1 — System Overview' },
+    { master:'master2', name:'Poster 2 — Navigate Any Corner' },
+    { master:'master3', name:'Poster 3 — Live, Learning, Low-Impact' }
+  ];
+  const tilePositions = [
+    {row:0, col:0, label:'R1 · C1  (top-left)'},
+    {row:0, col:1, label:'R1 · C2  (top-right)'},
+    {row:1, col:0, label:'R2 · C1  (bottom-left)'},
+    {row:1, col:1, label:'R2 · C2  (bottom-right)'}
+  ];
+
+  const root = document.getElementById('root');
+
+  posters.forEach(p => {
+    const group = document.createElement('div');
+    group.className = 'poster-group';
+
+    const title = document.createElement('div');
+    title.className = 'group-title';
+    title.textContent = p.name + '  ·  4 sheets, 2×2 grid';
+    group.appendChild(title);
+
+    const tpl = document.getElementById(p.master);
+
+    tilePositions.forEach(tp => {
+      const page = document.createElement('div');
+      page.className = 'page';
+
+      ['tl','tr','bl','br'].forEach(corner => {
+        const c = document.createElement('div');
+        c.className = 'crop ' + corner;
+        c.innerHTML = '<i class="h"></i><i class="v"></i>';
+        page.appendChild(c);
+      });
+
+      const win = document.createElement('div');
+      win.className = 'window';
+      const clone = document.createElement('div');
+      clone.className = 'master-clone';
+      clone.style.transform = `translate(${-tp.col * 186}mm, ${-tp.row * 273}mm)`;
+      clone.appendChild(tpl.content.cloneNode(true));
+      win.appendChild(clone);
+      page.appendChild(win);
+
+      const label = document.createElement('div');
+      label.className = 'tile-label';
+      label.innerHTML = `<b>${p.name}</b> — Tile ${tp.label} — trim along corner marks before joining`;
+      page.appendChild(label);
+
+      group.appendChild(page);
+    });
+
+    root.appendChild(group);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Real-Time Data</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="more.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Pillar 05</span>
+        <h1>Real-Time Data</h1>
+      </div>
+    </div>
+
+    <div class="updated-row"><span class="live-dot"></span> Live · Updated <span class="live-seconds">0s ago</span></div>
+
+    <div class="chip-row">
+      <div class="chip active">All Buildings</div>
+      <div class="chip">Lecture Halls</div>
+      <div class="chip">Labs</div>
+      <div class="chip">Library</div>
+    </div>
+
+    <div class="section-label">Walkway Conditions · RFID pace</div>
+
+    <div class="pace-card">
+      <div class="pace-head">
+        <div class="pace-name">Block A → Block C</div>
+        <div class="pace-val">0.6 m/s · slow</div>
+      </div>
+      <div class="pace-bar"><div class="pace-fill slow"></div></div>
+    </div>
+
+    <div class="pace-card">
+      <div class="pace-head">
+        <div class="pace-name">Main Walkway → Library</div>
+        <div class="pace-val">1.1 m/s · normal</div>
+      </div>
+      <div class="pace-bar"><div class="pace-fill normal"></div></div>
+    </div>
+
+    <div class="pace-card">
+      <div class="pace-head">
+        <div class="pace-name">Residential → Lecture Block</div>
+        <div class="pace-val">1.4 m/s · clear</div>
+      </div>
+      <div class="pace-bar"><div class="pace-fill fast"></div></div>
+    </div>
+
+    <div class="section-label">Facility Status · RFID occupancy</div>
+
+    <a href="attendance.html" class="list-item">
+      <div class="li-icon">◈</div>
+      <div class="li-body">
+        <div class="li-title">DK12 — Lecture Hall</div>
+        <div class="li-sub">142 people · snapshot 1 min ago</div>
+      </div>
+      <div class="li-tag busy">79%</div>
+    </a>
+
+    <a href="attendance.html" class="list-item">
+      <div class="li-icon">◈</div>
+      <div class="li-body">
+        <div class="li-title">Fluid Mechanics Lab</div>
+        <div class="li-sub">18 people · snapshot 1 min ago</div>
+      </div>
+      <div class="li-tag warn">75%</div>
+    </a>
+
+    <div class="list-item">
+      <div class="li-icon">◉</div>
+      <div class="li-body">
+        <div class="li-title">Main Library, Level 2</div>
+        <div class="li-sub">Quiet zone · 38% occupied</div>
+      </div>
+      <div class="li-tag free">Free</div>
+    </div>
+
+    <div class="list-item">
+      <div class="li-icon">◉</div>
+      <div class="li-body">
+        <div class="li-title">Dewan Utama</div>
+        <div class="li-sub">Leadership talk · ends in 12 min</div>
+      </div>
+      <div class="li-tag busy">Busy</div>
+    </div>
+
+    <div class="section-label">Today's Events</div>
+    <div class="list-item">
+      <div class="li-icon">✦</div>
+      <div class="li-body">
+        <div class="li-title">JPP Town Hall</div>
+        <div class="li-sub">6:00pm · Dewan Utama</div>
+      </div>
+      <div class="li-tag">Today</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

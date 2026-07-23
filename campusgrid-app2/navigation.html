@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Navigation</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="navigate">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="index.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Pillar 01</span>
+        <h1>Navigation</h1>
+      </div>
+    </div>
+
+    <div class="search-bar" style="margin-bottom:8px;">
+      <span class="ic">◎</span>
+      <input type="text" value="Your Location" readonly>
+    </div>
+    <div class="search-bar">
+      <span class="ic">⌖</span>
+      <select id="destSelect" style="flex:1; background:none; border:none; outline:none; color:var(--sand); font-size:13.5px; font-family:inherit;">
+        <option value="dk12">DK12 — Thermodynamics II</option>
+        <option value="library">Main Library, Level 2</option>
+        <option value="dewan">Dewan Utama</option>
+        <option value="fmlab">Fluid Mechanics Lab</option>
+      </select>
+    </div>
+
+    <div class="map-mock">
+      <svg viewBox="0 0 350 220" preserveAspectRatio="none">
+        <path id="mapLine" d="M40,180 L120,180 L120,110 L230,110 L230,50 L300,50" fill="none" stroke="#2fe0e6" stroke-width="2" stroke-dasharray="6 6" opacity="0.65"/>
+      </svg>
+      <div class="pin" style="left:40px; top:180px;"></div>
+      <div class="pin dest" style="left:300px; top:50px;"></div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="num count-up" id="timeStat" data-target="6" data-suffix=" min">0 min</div>
+        <div class="lbl">Walking time</div>
+      </div>
+      <div class="stat-box">
+        <div class="num count-up" id="distStat" data-target="480" data-suffix="m">0m</div>
+        <div class="lbl">Distance</div>
+      </div>
+    </div>
+
+    <div class="section-label">Turn-by-turn — <span id="destLabel" class="dim" style="text-transform:none; letter-spacing:0;">DK12</span></div>
+    <div class="route-steps" id="routeSteps">
+      <div class="route-line"></div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button class="btn solid" id="startNavBtn" style="width:100%;">Start Navigation</button>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

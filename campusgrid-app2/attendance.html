@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Smart Attendance</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="more.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Core System</span>
+        <h1>Smart Attendance</h1>
+      </div>
+    </div>
+
+    <div class="updated-row"><span class="live-dot"></span> Live · Updated <span class="live-seconds">0s ago</span></div>
+
+    <div class="card" id="attCard" style="text-align:center;">
+      <div class="section-label" style="margin-top:0; justify-content:center;">DK12 — Lecture Hall</div>
+      <div class="stat-row" style="margin-top:6px;">
+        <div class="stat-box">
+          <div class="num" id="tapsNum" data-cur="0">0</div>
+          <div class="lbl">RFID taps logged</div>
+        </div>
+        <div class="stat-box">
+          <div class="num" id="camNum" data-cur="0">0</div>
+          <div class="lbl">Camera headcount</div>
+        </div>
+      </div>
+      <div class="li-tag free" id="attStatus" style="display:inline-block; margin-top:4px;">Counts match — verified</div>
+    </div>
+
+    <div class="section-label">How It Works</div>
+    <div class="route-steps">
+      <div class="route-line"></div>
+      <div class="route-step">
+        <div class="route-dot">1</div>
+        <div>
+          <div class="rs-title">Tap in</div>
+          <div class="rs-sub">Student taps their existing campus ID on the doorway RFID reader — no new card needed.</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-dot">2</div>
+        <div>
+          <div class="rs-title">Instant sync</div>
+          <div class="rs-sub">Tag ID, timestamp, and door location sync to the CampusGrid backend in real time.</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-dot">3</div>
+        <div>
+          <div class="rs-title">Camera cross-check</div>
+          <div class="rs-sub">An overhead camera counts bodies crossing the doorway — no facial recognition, just a headcount — and compares it against the RFID tap count for that minute.</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-dot">✓</div>
+        <div>
+          <div class="rs-title">Auto-logged, or flagged</div>
+          <div class="rs-sub">Matching counts log attendance automatically. A mismatch (e.g. 2 taps, 1 body) flags both tags for review — catching shared or borrowed cards.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Recent Doorway Events <span class="see-all" style="text-transform:none;">ticks every ~5s</span></div>
+
+    <div id="attEvents">
+      <div class="list-item">
+        <div class="li-icon">◈</div>
+        <div class="li-body">
+          <div class="li-title">DK12 · 3:01pm</div>
+          <div class="li-sub">41 taps · 41 counted on camera</div>
+        </div>
+        <div class="li-tag free">Verified</div>
+      </div>
+
+      <div class="list-item">
+        <div class="li-icon">◈</div>
+        <div class="li-body">
+          <div class="li-title">Fluid Mechanics Lab · 2:58pm</div>
+          <div class="li-sub">18 taps · 17 counted on camera</div>
+        </div>
+        <div class="li-tag warn">Flagged</div>
+      </div>
+
+      <div class="list-item">
+        <div class="li-icon">◈</div>
+        <div class="li-body">
+          <div class="li-title">Workshop 2 · 2:45pm</div>
+          <div class="li-sub">12 taps · 12 counted on camera</div>
+        </div>
+        <div class="li-tag free">Verified</div>
+      </div>
+    </div>
+
+    <div class="section-label">Privacy Note</div>
+    <div class="card">
+      <div class="tr-sub" style="font-size:12.5px; line-height:1.6;">
+        The doorway camera only ever produces a headcount, not an identity — it never stores footage or runs facial recognition. Flags pair a room and a time window with the RFID tags involved, and go to staff for manual review, not automatic penalties.
+      </div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <button class="btn solid" id="viewRecordBtn" style="width:100%;">View My Attendance Record</button>
+    </div>
+
+    <div class="card attendance-panel hidden" id="recordPanel">
+      <div class="section-label" style="margin-top:0;">Sath — This Semester</div>
+      <div class="attendance-row"><span>Thermodynamics II</span><span class="ar-pct">96%</span></div>
+      <div class="attendance-row"><span>Fluid Mechanics Lab</span><span class="ar-pct">100%</span></div>
+      <div class="attendance-row"><span>Engineering Mathematics</span><span class="ar-pct">88%</span></div>
+      <div class="attendance-row"><span>Workshop 2</span><span class="ar-pct">92%</span></div>
+      <div class="tr-sub" style="margin-top:10px; font-size:11.5px;">Synced automatically from RFID tap records — no manual entry.</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Real-Time Data</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="more.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Pillar 05</span>
+        <h1>Real-Time Data</h1>
+      </div>
+    </div>
+
+    <div class="updated-row"><span class="live-dot"></span> Live · Updated <span class="live-seconds">0s ago</span></div>
+
+    <div class="chip-row" data-filter-target="#rtRoomList">
+      <div class="chip active" data-filter="all">All Buildings</div>
+      <div class="chip" data-filter="halls">Lecture Halls</div>
+      <div class="chip" data-filter="labs">Labs</div>
+      <div class="chip" data-filter="library">Library</div>
+    </div>
+
+    <div class="section-label">Facility Status</div>
+
+    <div id="rtRoomList">
+      <div class="list-item" data-cat="halls" data-room="dk12">
+        <div class="li-icon">◉</div>
+        <div class="li-body">
+          <div class="li-title">DK12 — Lecture Hall</div>
+          <div class="li-sub">Thermodynamics II · ends 3:20pm · 55% full</div>
+        </div>
+        <div class="li-tag busy">Busy</div>
+      </div>
+
+      <div class="list-item" data-cat="labs" data-room="fmlab">
+        <div class="li-icon">◉</div>
+        <div class="li-body">
+          <div class="li-title">Fluid Mechanics Lab</div>
+          <div class="li-sub">Block D · no session booked · 10% full</div>
+        </div>
+        <div class="li-tag free">Free</div>
+      </div>
+
+      <div class="list-item" data-cat="library" data-room="library">
+        <div class="li-icon">◉</div>
+        <div class="li-body">
+          <div class="li-title">Main Library, Level 2</div>
+          <div class="li-sub">Quiet zone · 38% full</div>
+        </div>
+        <div class="li-tag free">Free</div>
+      </div>
+
+      <div class="list-item" data-cat="halls" data-room="dewan">
+        <div class="li-icon">◉</div>
+        <div class="li-body">
+          <div class="li-title">Dewan Utama</div>
+          <div class="li-sub">Leadership talk · ends in 12 min · 70% full</div>
+        </div>
+        <div class="li-tag busy">Busy</div>
+      </div>
+
+      <div class="empty-note hidden">No facilities match this filter.</div>
+    </div>
+
+    <div class="section-label">Walkway Conditions <span class="see-all" style="text-transform:none;">via RFID checkpoints</span></div>
+
+    <div id="walkwayList">
+      <div class="list-item" data-walk="blockAC">
+        <div class="li-icon">⌁</div>
+        <div class="li-body">
+          <div class="li-title">Block A → Block C covered walk</div>
+          <div class="li-sub">Avg. pace 62% of normal · congested</div>
+        </div>
+        <div class="li-tag busy">Slow</div>
+      </div>
+
+      <div class="list-item" data-walk="libDewan">
+        <div class="li-icon">⌁</div>
+        <div class="li-body">
+          <div class="li-title">Library → Dewan Utama path</div>
+          <div class="li-sub">Avg. pace 96% of normal</div>
+        </div>
+        <div class="li-tag free">Clear</div>
+      </div>
+    </div>
+
+    <a href="attendance.html" class="list-item">
+      <div class="li-icon">◈</div>
+      <div class="li-body">
+        <div class="li-title">Smart Attendance system</div>
+        <div class="li-sub">See how room occupancy is measured</div>
+      </div>
+      <div class="li-tag">→</div>
+    </a>
+
+    <div class="section-label">Today's Events</div>
+    <div class="list-item">
+      <div class="li-icon">✦</div>
+      <div class="li-body">
+        <div class="li-title">JPP Town Hall</div>
+        <div class="li-sub">6:00pm · Dewan Utama</div>
+      </div>
+      <div class="li-tag">Today</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

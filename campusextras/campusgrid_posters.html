@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CampusGrid — Poster Set</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+  :root{
+    --navy-0:#060d18;
+    --navy-1:#0a1628;
+    --navy-2:#0d1f38;
+    --cyan:#2fd8f5;
+    --cyan-dim:#2fd8f533;
+    --amber:#f5a623;
+    --paper:#e9e6dc;
+    --line:#2fd8f555;
+    --line-strong:#2fd8f5aa;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#111;
+    font-family:'JetBrains Mono', monospace;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:40px;
+    padding:40px 0;
+  }
+
+  .poster{
+    width:1000px;
+    height:1250px;
+    background:var(--navy-1);
+    position:relative;
+    overflow:hidden;
+    color:var(--paper);
+    box-shadow:0 0 0 1px #000, 0 40px 80px rgba(0,0,0,.6);
+  }
+
+  /* blueprint grid */
+  .grid-bg{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:25px 25px;
+    opacity:.35;
+  }
+  .grid-bg::after{
+    content:'';
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--line-strong) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-strong) 1px, transparent 1px);
+    background-size:125px 125px;
+    opacity:.5;
+  }
+
+  /* corner crosshairs like a technical drawing sheet */
+  .crop{position:absolute; width:26px; height:26px; z-index:5;}
+  .crop::before,.crop::after{content:'';position:absolute;background:var(--cyan);}
+  .crop::before{width:100%;height:1px;top:50%;}
+  .crop::after{width:1px;height:100%;left:50%;}
+  .crop.tl{top:22px;left:22px;} .crop.tr{top:22px;right:22px;}
+  .crop.bl{bottom:22px;left:22px;} .crop.br{bottom:22px;right:22px;}
+
+  .frame{
+    position:absolute; inset:40px;
+    border:1px solid var(--line-strong);
+    z-index:4;
+  }
+
+  /* header bar: KMKK + crest */
+  .header{
+    position:absolute; top:56px; left:56px; right:56px;
+    display:flex; align-items:center; justify-content:space-between;
+    z-index:6;
+  }
+  .kmkk{
+    display:flex; align-items:center; gap:14px;
+  }
+  .crest{
+    width:52px; height:52px;
+    position:relative;
+  }
+  .crest svg{width:100%;height:100%;display:block;}
+  .kmkk-text{
+    display:flex; flex-direction:column; line-height:1;
+  }
+  .kmkk-text .k1{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:800;
+    font-size:22px;
+    letter-spacing:6px;
+    color:var(--paper);
+  }
+  .kmkk-text .k2{
+    font-size:8.5px;
+    letter-spacing:2.5px;
+    color:var(--cyan);
+    margin-top:5px;
+    text-transform:uppercase;
+  }
+  .doc-tag{
+    text-align:right;
+    font-size:9px;
+    letter-spacing:1.5px;
+    color:var(--cyan);
+    line-height:1.7;
+    text-transform:uppercase;
+  }
+  .doc-tag b{color:var(--amber);}
+
+  .rule{
+    position:absolute; left:56px; right:56px; top:128px;
+    height:1px; background:var(--line-strong); z-index:6;
+  }
+
+  /* project wordmark */
+  .wordmark{
+    position:absolute; top:165px; left:56px; z-index:6;
+  }
+  .wordmark .eyebrow{
+    font-size:11px; letter-spacing:5px; color:var(--amber); text-transform:uppercase;
+  }
+  .wordmark h1{
+    margin:8px 0 0; font-size:64px; letter-spacing:1px; color:var(--paper);
+    font-weight:800;
+  }
+  .wordmark h1 span{color:var(--cyan);}
+
+  .tagline{
+    position:absolute; left:56px; z-index:6;
+    font-size:13px; letter-spacing:1px; color:#b9c4d4; max-width:620px; line-height:1.6;
+  }
+
+  /* footer title block, like a real drawing sheet */
+  .titleblock{
+    position:absolute; left:56px; right:56px; bottom:56px;
+    border-top:1px solid var(--line-strong);
+    padding-top:14px;
+    display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0;
+    font-size:9px; letter-spacing:1px; color:#8fa3ba; text-transform:uppercase;
+    z-index:6;
+  }
+  .titleblock .cell{border-left:1px solid var(--line); padding:0 16px;}
+  .titleblock .cell:first-child{border-left:none; padding-left:0;}
+  .titleblock .cell b{display:block; color:var(--paper); font-size:12px; letter-spacing:.5px; margin-top:4px; text-transform:none;}
+
+  .pill-tag{
+    position:absolute; font-size:9px; letter-spacing:2px; color:var(--navy-0);
+    background:var(--cyan); padding:4px 10px; text-transform:uppercase; font-weight:700;
+  }
+
+  /* ================= POSTER 1: system overview ================= */
+  #p1 .nodes{ position:absolute; inset:0; z-index:3; }
+  .node{
+    position:absolute; width:150px;
+    border:1px solid var(--cyan); background:rgba(47,216,245,.05);
+    padding:14px; font-size:10.5px; letter-spacing:.5px; color:var(--paper);
+  }
+  .node .num{ font-size:9px; color:var(--amber); letter-spacing:2px; margin-bottom:6px; display:block;}
+  .node .name{ font-weight:700; font-size:13px; letter-spacing:1px; color:var(--cyan); }
+  .node .desc{ margin-top:6px; color:#a9b8ca; font-size:9.5px; line-height:1.4;}
+  svg.connectors{ position:absolute; inset:0; z-index:2; }
+  svg.connectors line, svg.connectors path{ stroke:var(--cyan); stroke-width:1; opacity:.55; fill:none;}
+  .hub{
+    position:absolute; width:120px; height:120px; border-radius:50%;
+    border:1.5px solid var(--amber); display:flex; align-items:center; justify-content:center;
+    text-align:center; font-size:10px; letter-spacing:1.5px; color:var(--amber); z-index:3;
+    background:var(--navy-1);
+  }
+  .hub b{display:block; font-size:15px; color:var(--paper); letter-spacing:1px; margin-bottom:4px;}
+
+  /* ================= POSTER 2: navigation ================= */
+  #p2 .corridor{
+    position:absolute; z-index:2;
+  }
+  .path-label{
+    position:absolute; font-size:9px; letter-spacing:1.5px; color:var(--cyan); z-index:3;
+  }
+  .dim{ position:absolute; font-size:8px; color:#8fa3ba; letter-spacing:1px; z-index:3;}
+  .waypoint{
+    position:absolute; width:10px; height:10px; border:1px solid var(--amber); z-index:3;
+    background:var(--navy-1);
+  }
+  .waypoint::after{ content:''; position:absolute; inset:3px; background:var(--amber);}
+  .stat-strip{
+    position:absolute; z-index:4; display:flex; gap:0;
+  }
+  .stat{
+    border:1px solid var(--line-strong); padding:16px 22px; min-width:150px;
+  }
+  .stat .num{ font-size:30px; font-weight:800; color:var(--cyan); }
+  .stat .label{ font-size:8.5px; letter-spacing:1.5px; color:#a9b8ca; margin-top:4px; text-transform:uppercase; }
+
+  /* ================= POSTER 3: intelligence / data ================= */
+  .pulse-ring{
+    position:absolute; border-radius:50%; border:1px solid var(--cyan); opacity:.4; z-index:2;
+  }
+  .readout{
+    position:absolute; border:1px solid var(--line-strong); background:rgba(47,216,245,.04);
+    padding:12px 16px; z-index:4; font-size:9.5px; color:#a9b8ca; letter-spacing:.5px;
+  }
+  .readout .label{ font-size:8px; color:var(--amber); letter-spacing:2px; text-transform:uppercase; }
+  .readout .val{ font-size:20px; color:var(--paper); font-weight:700; margin-top:4px; }
+  .bars{ position:absolute; z-index:4; display:flex; align-items:flex-end; gap:6px; }
+  .bars .bar{ width:9px; background:var(--cyan); opacity:.75; }
+  .leaf-mono{ position:absolute; z-index:3; }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- POSTER 1 — SYSTEM OVERVIEW                                    -->
+<!-- ============================================================ -->
+<div class="poster" id="p1">
+  <div class="grid-bg"></div>
+  <div class="frame"></div>
+  <div class="crop tl"></div><div class="crop tr"></div>
+  <div class="crop bl"></div><div class="crop br"></div>
+
+  <div class="header">
+    <div class="kmkk">
+      <div class="crest">
+        <svg viewBox="0 0 52 52">
+          <polygon points="26,2 48,13 48,32 26,50 4,32 4,13" fill="none" stroke="#2fd8f5" stroke-width="1.4"/>
+          <polygon points="26,9 42,17 42,30 26,43 10,30 10,17" fill="none" stroke="#f5a623" stroke-width="1"/>
+          <text x="26" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="800" fill="#e9e6dc">KMKK</text>
+        </svg>
+      </div>
+      <div class="kmkk-text">
+        <span class="k1">KMKK</span>
+        <span class="k2">Kolej Matrikulasi Kejuruteraan Kedah</span>
+      </div>
+    </div>
+    <div class="doc-tag">
+      INNOVATION CHALLENGE 2026<br>
+      SUBMISSION&nbsp;/&nbsp;<b>CAMPUSGRID</b>
+    </div>
+  </div>
+  <div class="rule"></div>
+
+  <div class="wordmark">
+    <div class="eyebrow">Smart Campus Directory &amp; Navigation Platform</div>
+    <h1>Campus<span>Grid</span></h1>
+  </div>
+  <div class="tagline" style="top:250px;">
+    Six systems, one grid. A living map of the campus that finds the room,
+    tracks the shuttle, and flags the shortest accessible route — before you ask twice.
+  </div>
+
+  <!-- schematic hub + six pillar nodes -->
+  <svg class="connectors" viewBox="0 0 1000 1250">
+    <line x1="500" y1="625" x2="180" y2="500"/>
+    <line x1="500" y1="625" x2="500" y2="470"/>
+    <line x1="500" y1="625" x2="820" y2="500"/>
+    <line x1="500" y1="625" x2="180" y2="810"/>
+    <line x1="500" y1="625" x2="500" y2="960"/>
+    <line x1="500" y1="625" x2="820" y2="810"/>
+  </svg>
+
+  <div class="hub" style="left:440px; top:565px;">
+    <div><b>GRID</b>CORE ENGINE</div>
+  </div>
+
+  <div class="node" style="left:80px; top:420px;">
+    <span class="num">01 / NAV</span>
+    <div class="name">Navigation</div>
+    <div class="desc">Turn-by-turn routing between any two points on campus.</div>
+  </div>
+  <div class="node" style="left:425px; top:325px;">
+    <span class="num">02 / DIR</span>
+    <div class="name">Directory</div>
+    <div class="desc">Every room, staff member, and department, searchable.</div>
+  </div>
+  <div class="node" style="left:770px; top:420px;">
+    <span class="num">03 / AI</span>
+    <div class="name">AI Assistant</div>
+    <div class="desc">Ask it in plain language. It answers with a route.</div>
+  </div>
+  <div class="node" style="left:80px; top:735px;">
+    <span class="num">04 / ACC</span>
+    <div class="name">Accessibility</div>
+    <div class="desc">Step-free paths flagged and prioritised by default.</div>
+  </div>
+  <div class="node" style="left:425px; top:830px;">
+    <span class="num">05 / RTD</span>
+    <div class="name">Real-Time Data</div>
+    <div class="desc">Live occupancy, shuttle position, and event changes.</div>
+  </div>
+  <div class="node" style="left:770px; top:735px;">
+    <span class="num">06 / SUS</span>
+    <div class="name">Sustainability</div>
+    <div class="desc">Routes that favour walking and shared transport.</div>
+  </div>
+
+  <div class="pill-tag" style="right:56px; top:1000px;">Prototype v1.0</div>
+
+  <div class="titleblock">
+    <div class="cell">SHEET<b>01 / 03</b></div>
+    <div class="cell">SCALE<b>1 : 1 CAMPUS</b></div>
+    <div class="cell">DRAWN BY<b>SATH · TEAM CAMPUSGRID</b></div>
+    <div class="cell">STATUS<b>PITCH — KMKK 2026</b></div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- POSTER 2 — NAVIGATE ANY CORNER                                 -->
+<!-- ============================================================ -->
+<div class="poster" id="p2">
+  <div class="grid-bg"></div>
+  <div class="frame"></div>
+  <div class="crop tl"></div><div class="crop tr"></div>
+  <div class="crop bl"></div><div class="crop br"></div>
+
+  <div class="header">
+    <div class="kmkk">
+      <div class="crest">
+        <svg viewBox="0 0 52 52">
+          <polygon points="26,2 48,13 48,32 26,50 4,32 4,13" fill="none" stroke="#2fd8f5" stroke-width="1.4"/>
+          <polygon points="26,9 42,17 42,30 26,43 10,30 10,17" fill="none" stroke="#f5a623" stroke-width="1"/>
+          <text x="26" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="800" fill="#e9e6dc">KMKK</text>
+        </svg>
+      </div>
+      <div class="kmkk-text">
+        <span class="k1">KMKK</span>
+        <span class="k2">Kolej Matrikulasi Kejuruteraan Kedah</span>
+      </div>
+    </div>
+    <div class="doc-tag">
+      ROUTE MODULE<br>
+      NAVIGATION&nbsp;/&nbsp;<b>ACCESSIBILITY</b>
+    </div>
+  </div>
+  <div class="rule"></div>
+
+  <div class="wordmark">
+    <div class="eyebrow">Pillar 01 &amp; 04</div>
+    <h1 style="font-size:52px;">Navigate<br>Any <span>Corner</span></h1>
+  </div>
+  <div class="tagline" style="top:340px; max-width:520px;">
+    No campus is fully flat, fully lit, or fully signed. CampusGrid routes around
+    that — every path checked for stairs, distance, and time of day.
+  </div>
+
+  <!-- corridor schematic: a routed path from A to B -->
+  <svg class="corridor" viewBox="0 0 1000 1250" style="top:0; left:0; width:1000px; height:1250px;">
+    <path d="M 120 780 L 350 780 L 350 950 L 700 950 L 700 700 L 880 700"
+          stroke="#2fd8f5" stroke-width="2" fill="none" stroke-dasharray="6 6"/>
+    <path d="M 120 780 L 250 780 L 250 640 L 700 640 L 700 700 L 880 700"
+          stroke="#8fa3ba" stroke-width="1" fill="none" opacity=".4"/>
+  </svg>
+
+  <div class="waypoint" style="left:115px; top:775px;"></div>
+  <div class="path-label" style="left:70px; top:795px;">A · LECTURE HALL 2</div>
+
+  <div class="waypoint" style="left:875px; top:695px;"></div>
+  <div class="path-label" style="left:830px; top:665px;">B · LIBRARY WING</div>
+
+  <div class="waypoint" style="left:345px; top:945px;"></div>
+  <div class="dim" style="left:355px; top:965px;">RAMP ACCESS — NO STAIRS</div>
+
+  <div class="waypoint" style="left:695px; top:695px;"></div>
+  <div class="dim" style="left:705px; top:715px;">COVERED WALKWAY</div>
+
+  <div class="dim" style="left:230px; top:750px;">240m · 4 MIN WALK</div>
+  <div class="dim" style="left:600px; top:590px;">— ALT. ROUTE, STAIRS ONLY —</div>
+
+  <div class="stat-strip" style="left:56px; top:150px; display:none;"></div>
+
+  <div class="stat-strip" style="left:56px; bottom:150px;">
+    <div class="stat"><div class="num">3</div><div class="label">Routes Compared</div></div>
+    <div class="stat" style="border-left:none;"><div class="num">0</div><div class="label">Stairs on Chosen Path</div></div>
+    <div class="stat" style="border-left:none;"><div class="num">4m</div><div class="label">Est. Walk Time</div></div>
+  </div>
+
+  <div class="titleblock">
+    <div class="cell">SHEET<b>02 / 03</b></div>
+    <div class="cell">SCALE<b>1 : 250</b></div>
+    <div class="cell">DRAWN BY<b>SATH · TEAM CAMPUSGRID</b></div>
+    <div class="cell">STATUS<b>PITCH — KMKK 2026</b></div>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- POSTER 3 — LIVE, LEARNING, LOW-IMPACT                          -->
+<!-- ============================================================ -->
+<div class="poster" id="p3">
+  <div class="grid-bg"></div>
+  <div class="frame"></div>
+  <div class="crop tl"></div><div class="crop tr"></div>
+  <div class="crop bl"></div><div class="crop br"></div>
+
+  <div class="header">
+    <div class="kmkk">
+      <div class="crest">
+        <svg viewBox="0 0 52 52">
+          <polygon points="26,2 48,13 48,32 26,50 4,32 4,13" fill="none" stroke="#2fd8f5" stroke-width="1.4"/>
+          <polygon points="26,9 42,17 42,30 26,43 10,30 10,17" fill="none" stroke="#f5a623" stroke-width="1"/>
+          <text x="26" y="30" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="800" fill="#e9e6dc">KMKK</text>
+        </svg>
+      </div>
+      <div class="kmkk-text">
+        <span class="k1">KMKK</span>
+        <span class="k2">Kolej Matrikulasi Kejuruteraan Kedah</span>
+      </div>
+    </div>
+    <div class="doc-tag">
+      INTELLIGENCE MODULE<br>
+      AI&nbsp;/&nbsp;DATA&nbsp;/&nbsp;<b>SUSTAINABILITY</b>
+    </div>
+  </div>
+  <div class="rule"></div>
+
+  <div class="wordmark">
+    <div class="eyebrow">Pillar 03, 05 &amp; 06</div>
+    <h1 style="font-size:52px;">Live,<br>Learning,<br><span>Low-Impact</span></h1>
+  </div>
+
+  <!-- concentric pulse rings around a central "ask" point -->
+  <div class="pulse-ring" style="width:260px; height:260px; left:640px; top:430px;"></div>
+  <div class="pulse-ring" style="width:400px; height:400px; left:570px; top:360px;"></div>
+  <div class="pulse-ring" style="width:540px; height:540px; left:500px; top:290px;"></div>
+
+  <div class="readout" style="left:560px; top:270px; width:170px;">
+    <div class="label">Ask CampusGrid</div>
+    <div class="val">"Where's<br>the shuttle?"</div>
+  </div>
+  <div class="readout" style="left:790px; top:470px; width:150px;">
+    <div class="label">Shuttle ETA</div>
+    <div class="val">6 min</div>
+  </div>
+  <div class="readout" style="left:790px; top:600px; width:150px;">
+    <div class="label">Hall Occupancy</div>
+    <div class="val">62%</div>
+  </div>
+
+  <!-- sustainability bar readout -->
+  <div class="bars" style="left:600px; bottom:280px; height:110px;">
+    <div class="bar" style="height:40%;"></div>
+    <div class="bar" style="height:65%; background:#f5a623;"></div>
+    <div class="bar" style="height:90%;"></div>
+    <div class="bar" style="height:55%;"></div>
+    <div class="bar" style="height:75%;"></div>
+  </div>
+  <div class="dim" style="left:600px; bottom:255px;">WALK / SHARED-TRANSPORT ROUTES CHOSEN THIS WEEK</div>
+
+  <div class="tagline" style="top:520px; max-width:420px;">
+    The assistant answers in plain language. The data behind it updates
+    in real time. The routes it prefers cut down on unnecessary transport.
+  </div>
+
+  <div class="titleblock">
+    <div class="cell">SHEET<b>03 / 03</b></div>
+    <div class="cell">SCALE<b>N/A — LIVE DATA</b></div>
+    <div class="cell">DRAWN BY<b>SATH · TEAM CAMPUSGRID</b></div>
+    <div class="cell">STATUS<b>PITCH — KMKK 2026</b></div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CampusGrid — 30s Promo (1920x1080)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+  :root{
+    --navy:#0a1628;
+    --cyan:#2fd8f5;
+    --amber:#f5a623;
+    --paper:#e9e6dc;
+    --line:#2fd8f540;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%; background:#111; font-family:'JetBrains Mono',monospace; overflow:hidden;}
+
+  .viewport-wrapper{
+    width:100vw; height:100vh;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .stage{
+    width:1920px; height:1080px;
+    background:var(--navy);
+    position:relative;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+    flex-shrink:0;
+  }
+  .grid-bg{
+    position:absolute; inset:0;
+    background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:48px 48px;
+    opacity:.5;
+  }
+
+  .progress-track{position:absolute; top:0; left:0; right:0; height:5px; background:rgba(255,255,255,.08); z-index:20;}
+  .progress-fill{position:absolute; top:0; left:0; height:100%; width:0%; background:var(--cyan); animation:fill 30s linear forwards;}
+  @keyframes fill{ from{width:0%;} to{width:100%;} }
+
+  .layer{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0; text-align:center; padding:0 120px;}
+
+  /* ---------- BEAT 1: 0–3s — KMKK Panthers crest + wordmark ---------- */
+  #beat1{ animation: showhide 3s ease forwards; }
+  .crest{width:150px; height:150px; margin-bottom:26px;}
+  #beat1 .k1{font-size:34px; letter-spacing:9px; color:var(--paper); font-weight:800;}
+  #beat1 .k2{font-size:16px; letter-spacing:4px; color:var(--cyan); margin-top:14px; text-transform:uppercase;}
+  #beat1 .k3{font-size:15px; letter-spacing:4px; color:var(--amber); margin-top:46px; text-transform:uppercase;}
+
+  /* ---------- BEAT 2: 2.7–7.3s — CampusGrid title + tagline ---------- */
+  #beat2{ animation: showhide2 4.6s ease forwards; animation-delay:2.7s; }
+  #beat2 h1{font-size:120px; color:var(--paper); font-weight:800; letter-spacing:1px;}
+  #beat2 h1 span{color:var(--cyan);}
+  #beat2 p{margin-top:30px; font-size:24px; color:#b9c4d4; letter-spacing:.4px; line-height:1.6; max-width:900px;}
+
+  /* ---------- BEAT 3: 6.7–22.3s — six pillars, cycling ---------- */
+  #beat3{ animation: showhide3 15.6s ease forwards; animation-delay:6.7s; }
+  #beat3 .eyebrow{font-size:19px; letter-spacing:6px; color:var(--amber); text-transform:uppercase; margin-bottom:56px;}
+  .pillar-stack{position:relative; width:820px; height:320px;}
+  .pillar{
+    position:absolute; inset:0; opacity:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border:1px solid var(--cyan); background:rgba(47,216,245,.05); padding:40px;
+  }
+  .pillar .num{font-size:18px; color:var(--amber); letter-spacing:5px; margin-bottom:18px;}
+  .pillar .name{font-size:52px; color:var(--cyan); font-weight:700; letter-spacing:.5px;}
+  .pillar .desc{margin-top:20px; font-size:21px; color:#a9b8ca; line-height:1.5;}
+
+  .p1{animation: pillarcycle 2.6s ease forwards; animation-delay:0s;}
+  .p2{animation: pillarcycle 2.6s ease forwards; animation-delay:2.6s;}
+  .p3{animation: pillarcycle 2.6s ease forwards; animation-delay:5.2s;}
+  .p4{animation: pillarcycle 2.6s ease forwards; animation-delay:7.8s;}
+  .p5{animation: pillarcycle 2.6s ease forwards; animation-delay:10.4s;}
+  .p6{animation: pillarcycle 2.6s ease forwards; animation-delay:13.0s;}
+
+  @keyframes pillarcycle{
+    0%{opacity:0; transform:translateY(14px);}
+    12%{opacity:1; transform:translateY(0);}
+    88%{opacity:1; transform:translateY(0);}
+    100%{opacity:0; transform:translateY(-14px);}
+  }
+
+  /* ---------- BEAT 4: 22.3–30s — CTA / closing ---------- */
+  #beat4{ animation: showhide4 8s ease forwards; animation-delay:22.3s; }
+  #beat4 h2{font-size:64px; color:var(--paper); font-weight:800;}
+  #beat4 h2 span{color:var(--cyan);}
+  #beat4 .cta-line{margin-top:24px; font-size:20px; letter-spacing:2px; color:var(--amber); text-transform:uppercase;}
+  #beat4 .cta-sub{margin-top:10px; font-size:16px; letter-spacing:1.5px; color:#8fa3ba; text-transform:uppercase;}
+
+  @keyframes showhide{
+    0%{opacity:0;} 12%{opacity:1;} 82%{opacity:1;} 100%{opacity:0;}
+  }
+  @keyframes showhide2{
+    0%{opacity:0; transform:translateY(10px);} 14%{opacity:1; transform:translateY(0);} 85%{opacity:1;} 100%{opacity:0;}
+  }
+  @keyframes showhide3{
+    0%{opacity:0;} 4%{opacity:1;} 96%{opacity:1;} 100%{opacity:0;}
+  }
+  @keyframes showhide4{
+    0%{opacity:0; transform:scale(.97);} 18%{opacity:1; transform:scale(1);} 100%{opacity:1;}
+  }
+
+  .frame-corner{position:absolute; width:30px; height:30px; z-index:10;}
+  .frame-corner::before,.frame-corner::after{content:'';position:absolute;background:var(--cyan);opacity:.6;}
+  .frame-corner::before{width:100%;height:1.5px;top:0;}
+  .frame-corner::after{width:1.5px;height:100%;left:0;}
+  .fc-tl{top:26px;left:26px;}
+  .fc-tr{top:26px;right:26px; transform:scaleX(-1);}
+  .fc-bl{bottom:26px;left:26px; transform:scaleY(-1);}
+  .fc-br{bottom:26px;right:26px; transform:scale(-1);}
+
+  .replay{
+    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
+    font-size:13px; letter-spacing:1.5px; color:#5a6b7d; text-transform:uppercase; z-index:20;
+  }
+
+  .rec-note{
+    position:fixed; top:10px; left:10px; z-index:50;
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:#8fa3ba;
+    background:rgba(0,0,0,.55); padding:6px 10px; border:1px solid #333;
+  }
+  @media print{ .rec-note{display:none;} }
+</style>
+</head>
+<body>
+
+<div class="rec-note">Canvas is fixed at 1920×1080. Maximize/fullscreen the browser window for a crisp native-resolution recording.</div>
+
+<div class="viewport-wrapper">
+  <div class="stage" id="stage">
+    <div class="grid-bg"></div>
+    <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
+    <div class="frame-corner fc-tl"></div><div class="frame-corner fc-tr"></div>
+    <div class="frame-corner fc-bl"></div><div class="frame-corner fc-br"></div>
+
+    <!-- BEAT 1 -->
+    <div class="layer" id="beat1">
+      <svg class="crest" viewBox="0 0 52 52">
+        <polygon points="26,2 48,13 48,32 26,50 4,32 4,13" fill="none" stroke="#2fd8f5" stroke-width="1.4"/>
+        <polygon points="26,9 42,17 42,30 26,43 10,30 10,17" fill="none" stroke="#f5a623" stroke-width="1"/>
+        <!-- original abstract panther-head mark -->
+        <polygon points="15,19 22,10 24,21" fill="none" stroke="#e9e6dc" stroke-width="1.1" stroke-linejoin="round"/>
+        <polygon points="37,19 30,10 28,21" fill="none" stroke="#e9e6dc" stroke-width="1.1" stroke-linejoin="round"/>
+        <ellipse cx="26" cy="29" rx="10.5" ry="8.5" fill="none" stroke="#e9e6dc" stroke-width="1.1"/>
+        <circle cx="21.5" cy="27" r="1.2" fill="#2fd8f5"/>
+        <circle cx="30.5" cy="27" r="1.2" fill="#2fd8f5"/>
+        <path d="M 23 33 Q 26 35.5 29 33" fill="none" stroke="#e9e6dc" stroke-width="1"/>
+        <path d="M 26 30 L 26 33" fill="none" stroke="#e9e6dc" stroke-width="1"/>
+      </svg>
+      <div class="k1">KMKK PANTHERS</div>
+      <div class="k2">Kolej Matrikulasi Kejuruteraan Kedah</div>
+      <div class="k3">FutureTech Innovation 2026 presents</div>
+    </div>
+
+    <!-- BEAT 2 -->
+    <div class="layer" id="beat2">
+      <h1>Campus<span>Grid</span></h1>
+      <p>A smart campus directory and navigation platform —
+      built to find the room, track the shuttle, and route around the stairs.</p>
+    </div>
+
+    <!-- BEAT 3 -->
+    <div class="layer" id="beat3">
+      <div class="eyebrow">Six Systems. One Grid.</div>
+      <div class="pillar-stack">
+        <div class="pillar p1"><span class="num">01</span><div class="name">Navigation</div><div class="desc">Turn-by-turn routing, campus-wide</div></div>
+        <div class="pillar p2"><span class="num">02</span><div class="name">Directory</div><div class="desc">Every room and department, searchable</div></div>
+        <div class="pillar p3"><span class="num">03</span><div class="name">AI Assistant</div><div class="desc">Ask it plainly. It answers with a route</div></div>
+        <div class="pillar p4"><span class="num">04</span><div class="name">Accessibility</div><div class="desc">Step-free paths, prioritised by default</div></div>
+        <div class="pillar p5"><span class="num">05</span><div class="name">Real-Time Data</div><div class="desc">Live occupancy and shuttle position</div></div>
+        <div class="pillar p6"><span class="num">06</span><div class="name">Sustainability</div><div class="desc">Routes that favour walking, not idling</div></div>
+      </div>
+    </div>
+
+    <!-- BEAT 4 -->
+    <div class="layer" id="beat4">
+      <h2>Campus<span>Grid</span></h2>
+      <div class="cta-line">Presented by KMKK Panthers</div>
+      <div class="cta-sub">FutureTech Innovation 2026 · Team CampusGrid · Sath</div>
+    </div>
+
+    <div class="replay" id="replayNote">Loops automatically — record ~30s</div>
+  </div>
+</div>
+
+<script>
+  const stage = document.getElementById('stage');
+  function restart(){
+    document.querySelectorAll('#stage *').forEach(el=>{ el.style.animation = 'none'; });
+    void stage.offsetWidth;
+    document.querySelectorAll('#stage *').forEach(el=>{ el.style.animation = ''; });
+  }
+  setInterval(restart, 30400);
+</script>
+
+</body>
+</html>

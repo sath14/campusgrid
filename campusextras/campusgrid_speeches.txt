@@ -1,0 +1,262 @@
+================================================================
+CAMPUSGRID — PITCH PRESENTATION SPEECH SCRIPT
+5 Speakers | Slides 1–9
+================================================================
+
+
+----------------------------------------------------------------
+SPEAKER 1 — Part 1 of 5
+Slides: Title, The Problem
+----------------------------------------------------------------
+
+Good morning, everyone.
+
+Think about the last time you had to find a lecture hall you'd
+never been to before. Maybe you were late. Maybe you asked three
+different people before someone actually knew the answer. Now
+multiply that by every new student, every visitor, every semester,
+across an entire campus.
+
+That's the problem we're here to solve today. My name is [Speaker
+1 Name], and together with my team, I'm here to present
+CampusGrid — one grid, every path.
+
+Let's start with what's actually broken.
+
+Right now, campus life runs on scattered systems. If you're a
+student here, you're juggling at least six different things just
+to get through your week: a printed or PDF timetable, a group
+chat for class updates, a noticeboard for event flyers, another
+one for facility notices, a paper attendance sheet, and whatever
+map you can find — usually outdated.
+
+None of these systems talk to each other. Finding a lecture hall,
+a lab, or an office still relies on word-of-mouth or guesswork.
+Attendance is still taken manually, which eats into class time and
+leaves records open to error. And information about what's
+happening on campus right now — which hall is free, what event is
+on, which route is accessible — lives in disconnected places that
+nobody checks consistently.
+
+There is no single platform that ties navigation, directory
+information, and real-time campus data together. That gap is
+exactly where CampusGrid comes in, and that's what my colleague is
+going to walk you through next.
+
+[Transition: "I'll hand it over to [Speaker 2 Name] to introduce
+the solution."]
+
+
+----------------------------------------------------------------
+SPEAKER 2 — Part 2 of 5
+Slides: The Solution, Six Pillars
+----------------------------------------------------------------
+
+Thank you, [Speaker 1 Name].
+
+So if the problem is that campus information is scattered across
+six disconnected systems, the solution has to be just as simple as
+the problem is complicated: put it all in one place.
+
+That's CampusGrid. A single platform that turns the campus into a
+navigable, living map — where finding a room, checking your
+attendance, and knowing what's happening right now all happen in
+one app, in one motion.
+
+Here's how it works in practice. A student opens the app. The Grid
+locates them and guides them — whether that's to a classroom, a
+lecturer's office, or an event hall. And as they move through
+campus, the campus itself responds in real time — updating room
+status, event schedules, and facility information as things
+change.
+
+To make that possible, we built CampusGrid around six pillars,
+and I want to walk you through each one, because together they're
+what make this platform different from anything else out there.
+
+Pillar one is Navigation — turn-by-turn routing, indoor and
+outdoor, between any two points on campus. No more guessing which
+building the room is actually in.
+
+Pillar two is Directory — a living index of rooms, staff, labs,
+and services, searchable in seconds instead of asking around.
+
+Pillar three is our AI Assistant. You don't search a database —
+you just ask, in plain language, "where's my next class?" and you
+get a route, not a link.
+
+Pillar four is Accessibility. Every route CampusGrid suggests
+accounts for mobility needs — ramps, lift access — by default, not
+as an afterthought.
+
+Pillar five is Real-Time Data — live facility status, room
+availability, and event updates, exactly as they happen.
+
+And pillar six is Sustainability — using route and usage data to
+encourage walkability and reduce unnecessary energy use across
+campus.
+
+Six pillars, one grid. And one of those pillars — attendance
+through real-time data — deserves its own spotlight, because it
+solves one of the most tedious parts of campus life. I'll pass it
+to [Speaker 3 Name] to show you exactly how.
+
+[Transition: "Over to [Speaker 3 Name] for Smart Attendance."]
+
+
+----------------------------------------------------------------
+SPEAKER 3 — Part 3 of 5
+Slide: Smart Attendance (RFID)
+----------------------------------------------------------------
+
+Thanks, [Speaker 2 Name].
+
+I want to talk about something every student and every lecturer in
+this room has lived through: attendance that takes itself.
+
+Right now, attendance means someone standing at the front of a
+class, calling out names, and losing five to ten minutes of
+teaching time every single session. It's manual, it's slow, and
+it's easy to get wrong.
+
+CampusGrid replaces that entirely using RFID — radio-frequency
+identification — and here's exactly how it works, in four steps.
+
+Step one: Tap in. A student simply taps their existing campus ID
+card on an RFID reader mounted at the classroom entrance. No new
+card, no new device — just the ID they already carry.
+
+Step two: Instant sync. The moment that tap happens, the tag ID,
+the timestamp, and the exact location sync to the CampusGrid
+backend in real time. There's no delay, no manual entry.
+
+Step three: Auto-logged. That data is automatically matched
+against the class schedule and recorded as attendance — no roll
+call, no paper, no room for human error.
+
+Step four: Visible to all. Lecturers and admin staff get a live
+attendance dashboard they can check at any moment. Students, on
+the other hand, can view their own attendance record on demand,
+so there's never a dispute about whether they showed up.
+
+This one feature alone gives back class time, removes manual
+error, and gives everyone — students, lecturers, and
+administrators — a single source of truth for attendance.
+
+But attendance is just one piece of what makes CampusGrid
+different from anything else on the market. I'll let [Speaker 4
+Name] explain why no one else has put this all together.
+
+[Transition: "Over to [Speaker 4 Name]."]
+
+
+----------------------------------------------------------------
+SPEAKER 4 — Part 4 of 5
+Slides: Why CampusGrid, System Architecture
+----------------------------------------------------------------
+
+Thank you, [Speaker 3 Name].
+
+At this point you might be thinking — navigation apps exist.
+Directory apps exist. Attendance systems exist. So what makes
+CampusGrid different?
+
+The answer is simple: every other platform solves one piece. None
+of them solve all six.
+
+Generic map apps give you navigation, and that's where it stops —
+no directory, no AI assistant, no accessibility awareness, no
+real-time data, no sustainability insight. Campus directory apps
+give you a searchable list of rooms and staff, but they don't help
+you get there, and they don't know what's happening right now.
+Attendance systems solve exactly one problem — attendance — and
+nothing else.
+
+CampusGrid is the only platform that brings navigation, directory,
+AI assistance, accessibility, real-time data, and sustainability
+together, under one grid. That's not a small feature difference —
+that's a fundamentally different category of product.
+
+Now, a platform this connected only works if the architecture
+behind it is solid, so let me show you how it's actually built.
+
+It comes down to three layers, working together.
+
+The first layer is the client — the Mobile App. This is what
+students and staff interact with directly: navigation, directory
+search, and the AI assistant all live here.
+
+The second layer is the backend — CampusGrid Cloud. This is where
+the real intelligence lives: the routing engine that calculates
+paths, the data synchronization that keeps everything current, and
+the dashboards that lecturers and admins rely on.
+
+And the third layer is the RFID and IoT network — the physical
+sensors and readers spread across campus, feeding attendance data
+and facility status back into the cloud in real time.
+
+Client, cloud, sensors — simple on the surface, but fully connected
+underneath. And that architecture is what makes it possible to
+actually roll this out, starting small and scaling up. I'll hand
+it to [Speaker 5 Name] to walk you through exactly how we get
+there.
+
+[Transition: "Over to [Speaker 5 Name] for the roadmap."]
+
+
+----------------------------------------------------------------
+SPEAKER 5 — Part 5 of 5
+Slides: Rollout Roadmap, Closing
+----------------------------------------------------------------
+
+Thank you, [Speaker 4 Name].
+
+We've shown you the problem, the solution, the six pillars, smart
+attendance, and the architecture behind it all. Now let's talk
+about how CampusGrid actually gets built — because we're not
+proposing to boil the ocean on day one. We have a clear, three-
+phase roadmap.
+
+Phase one is the pilot, right here at KMKK. We deploy navigation,
+directory, and RFID attendance in one residential college first,
+as a live testbed. This lets us validate the system with real
+students, real classrooms, and real feedback before we go further.
+
+Phase two is expansion. Once the pilot proves itself at KMKK, we
+extend CampusGrid to the neighbouring colleges — KMK, KMP, and
+KMPP — all sharing one unified directory and one connected grid.
+This is where the platform starts to show its real value: multiple
+colleges, one system.
+
+Phase three is scale. This is the full six-pillar rollout —
+navigation, directory, AI assistant, accessibility, real-time data,
+and sustainability analytics — deployed institution-wide.
+
+From one college to a connected network. That's the path.
+
+So let's bring it back to where we started. Right now, finding a
+classroom, taking attendance, or knowing what's happening on campus
+means juggling six different, disconnected systems. CampusGrid
+replaces all of that with one grid, and one simple idea: every
+path on campus, in one place.
+
+We're not asking you to imagine a distant future. We're asking you
+to picture a pilot — one college, one grid, starting now.
+
+CampusGrid. One grid, every path. Thank you.
+
+[End of presentation — open floor for questions.]
+
+
+================================================================
+DELIVERY NOTES
+================================================================
+- Total estimated speaking time: ~8–10 minutes across 5 speakers
+  (roughly 90 seconds to 2 minutes per speaker).
+- Replace [Speaker 1 Name] through [Speaker 5 Name] with actual
+  names before rehearsing.
+- Each speaker's closing line hands off directly to the next name —
+  keep that line as a live cue during rehearsal, not just on paper.
+- Pause briefly after each rhetorical question (Speaker 1's opening,
+  Speaker 4's "so what makes CampusGrid different?") to let it land.
+================================================================

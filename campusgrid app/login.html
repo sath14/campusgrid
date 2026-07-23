@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Sign In</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="login" data-no-auth>
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="brand-row" style="margin-top:40px;">
+      <div class="brand-dotgrid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="eyebrow" style="margin:0;">CampusGrid</span>
+    </div>
+    <div class="greeting" style="font-size:28px;">Sign in</div>
+    <div class="subgreeting">Access your grid — attendance, routes, and live campus data.</div>
+
+    <form id="loginForm" class="auth-form">
+      <div class="search-bar" style="margin-bottom:10px;">
+        <span class="ic">@</span>
+        <input type="email" id="email" placeholder="Email" value="sath@campusgrid.edu" required>
+      </div>
+      <div class="search-bar" style="margin-bottom:16px;">
+        <span class="ic">•</span>
+        <input type="password" id="password" placeholder="Password" value="demo123" required>
+      </div>
+      <div id="loginError" class="auth-error" style="display:none;"></div>
+      <button type="submit" class="btn solid" id="loginBtn">Sign In</button>
+    </form>
+
+    <div class="auth-switch">
+      No account? <a href="#" id="showRegister">Create one</a>
+    </div>
+
+    <form id="registerForm" class="auth-form" style="display:none;">
+      <div class="search-bar" style="margin-bottom:10px;">
+        <span class="ic">◎</span>
+        <input type="text" id="regName" placeholder="Full name" required>
+      </div>
+      <div class="search-bar" style="margin-bottom:10px;">
+        <span class="ic">@</span>
+        <input type="email" id="regEmail" placeholder="Email" required>
+      </div>
+      <div class="search-bar" style="margin-bottom:16px;">
+        <span class="ic">•</span>
+        <input type="password" id="regPassword" placeholder="Password (min 6 chars)" minlength="6" required>
+      </div>
+      <div id="regError" class="auth-error" style="display:none;"></div>
+      <button type="submit" class="btn solid">Create Account</button>
+      <div class="auth-switch" style="margin-top:14px;">
+        Have an account? <a href="#" id="showLogin">Sign in</a>
+      </div>
+    </form>
+
+    <div class="card dim-card" style="margin-top:24px;">
+      <div class="dim-title">Demo account</div>
+      <div class="dim-text">sath@campusgrid.edu · demo123<br>Pre-loaded with RFID attendance, timetable & sustainability data.</div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script>
+if (CampusAPI.getToken()) window.location.href = 'index.html';
+
+document.getElementById('showRegister').onclick = e => {
+  e.preventDefault();
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'block';
+};
+document.getElementById('showLogin').onclick = e => {
+  e.preventDefault();
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+};
+
+document.getElementById('loginForm').onsubmit = async e => {
+  e.preventDefault();
+  const err = document.getElementById('loginError');
+  err.style.display = 'none';
+  try {
+    const data = await CampusAPI.login(
+      document.getElementById('email').value.trim(),
+      document.getElementById('password').value
+    );
+    CampusAPI.setToken(data.token);
+    CampusAPI.setUser(data.user);
+    window.location.href = 'index.html';
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.style.display = 'block';
+  }
+};
+
+document.getElementById('registerForm').onsubmit = async e => {
+  e.preventDefault();
+  const err = document.getElementById('regError');
+  err.style.display = 'none';
+  try {
+    const data = await CampusAPI.register(
+      document.getElementById('regEmail').value.trim(),
+      document.getElementById('regPassword').value,
+      document.getElementById('regName').value.trim()
+    );
+    CampusAPI.setToken(data.token);
+    CampusAPI.setUser(data.user);
+    window.location.href = 'index.html';
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.style.display = 'block';
+  }
+};
+</script>
+</body>
+</html>

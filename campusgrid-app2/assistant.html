@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — AI Assistant</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="assistant">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="index.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Pillar 03</span>
+        <h1>AI Assistant</h1>
+      </div>
+    </div>
+
+    <div class="chat-scroll" id="chatScroll">
+      <div class="bubble bot reveal">Hi Sath — ask me anything about campus. Try one of the prompts below, or type your own.</div>
+      <div class="bubble bot reveal">Tip: upload your timetable once in Settings and I'll message you before every class with when to leave — based on live walkway conditions, not just distance.</div>
+    </div>
+
+    <div class="prompt-row">
+      <div class="prompt-chip">Where's my next class?</div>
+      <div class="prompt-chip">When should I leave for my next class?</div>
+      <div class="prompt-chip">Is the library busy right now?</div>
+      <div class="prompt-chip">Accessible route to the hall?</div>
+    </div>
+  </div>
+
+  <div class="chat-input-row">
+    <input type="text" placeholder="Ask CampusGrid…">
+    <button>➤</button>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

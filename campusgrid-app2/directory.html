@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Directory</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="directory">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="index.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Pillar 02</span>
+        <h1>Directory</h1>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <span class="ic">⌕</span>
+      <input type="text" id="dirSearch" placeholder="Search rooms, staff, labs, services">
+    </div>
+
+    <div class="chip-row" data-filter-target="#dirList">
+      <div class="chip active" data-filter="all">All</div>
+      <div class="chip" data-filter="rooms">Rooms</div>
+      <div class="chip" data-filter="staff">Staff</div>
+      <div class="chip" data-filter="labs">Labs</div>
+      <div class="chip" data-filter="services">Services</div>
+    </div>
+
+    <div class="section-label">Frequently Searched</div>
+
+    <div id="dirList">
+      <a href="navigation.html" class="list-item" data-cat="rooms" data-dest="dk12" data-search="dk12 lecture hall block c thermodynamics">
+        <div class="li-icon">▦</div>
+        <div class="li-body">
+          <div class="li-title">DK12 — Lecture Hall</div>
+          <div class="li-sub">Block C, Level 1 · Capacity 60</div>
+        </div>
+        <div class="li-tag">Route →</div>
+      </a>
+
+      <a href="navigation.html" class="list-item" data-cat="labs" data-dest="fmlab" data-search="fluid mechanics lab block d engineering">
+        <div class="li-icon">▦</div>
+        <div class="li-body">
+          <div class="li-title">Fluid Mechanics Lab</div>
+          <div class="li-sub">Block D, Level 2 · Eng. Dept</div>
+        </div>
+        <div class="li-tag">Route →</div>
+      </a>
+
+      <a href="navigation.html" class="list-item" data-cat="staff" data-dest="dk12" data-search="puan aina rahman physics office">
+        <div class="li-icon">▦</div>
+        <div class="li-body">
+          <div class="li-title">Puan Aina Rahman</div>
+          <div class="li-sub">Physics Unit · Office B-204</div>
+        </div>
+        <div class="li-tag">Route →</div>
+      </a>
+
+      <a href="navigation.html" class="list-item" data-cat="services" data-dest="dk12" data-search="student affairs office admin">
+        <div class="li-icon">▦</div>
+        <div class="li-body">
+          <div class="li-title">Student Affairs Office</div>
+          <div class="li-sub">Admin Block, Ground Floor</div>
+        </div>
+        <div class="li-tag">Route →</div>
+      </a>
+
+      <a href="navigation.html" class="list-item" data-cat="rooms" data-dest="library" data-search="main library central block">
+        <div class="li-icon">▦</div>
+        <div class="li-body">
+          <div class="li-title">Main Library</div>
+          <div class="li-sub">Central Block · 3 levels</div>
+        </div>
+        <div class="li-tag">Route →</div>
+      </a>
+
+      <a href="navigation.html" class="list-item" data-cat="rooms" data-dest="dewan" data-search="dewan utama main hall">
+        <div class="li-icon">▦</div>
+        <div class="li-body">
+          <div class="li-title">Dewan Utama</div>
+          <div class="li-sub">Main Hall · Capacity 800</div>
+        </div>
+        <div class="li-tag">Route →</div>
+      </a>
+
+      <div id="dirEmpty" class="empty-note hidden">No matches — try a different search term or filter.</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
