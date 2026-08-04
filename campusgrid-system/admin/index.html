@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CampusGrid Admin</title>
+  <style>
+    :root {
+      --bg:#0b1220; --panel:#151d2d; --text:#e8eef8; --muted:#8b9bb0;
+      --ok:#3ecf8e; --bad:#f07178; --line:#243044; --accent:#4da3ff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    h1{margin:0;font-size:1.25rem}
+    .muted{color:var(--muted);font-size:.9rem}
+    main{padding:16px 20px;display:grid;gap:16px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+    .num{font-size:1.8rem;font-weight:700;margin-top:6px}
+    table{width:100%;border-collapse:collapse;font-size:.85rem}
+    th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--muted)}
+    .flag{color:var(--bad);font-weight:700}
+    .ok{color:var(--ok)}
+    input,button{font:inherit}
+    input{background:#0f1726;border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:8px}
+    button{background:var(--accent);border:0;color:#041018;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+    #loginBox,#dash{max-width:1100px;margin:0 auto}
+    img.snap{max-width:180px;border-radius:8px;border:1px solid var(--line)}
+    @media(max-width:800px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>CampusGrid Server Admin</h1>
+      <div class="muted">Rapid-tap integrity · headcount check · captured photos</div>
+    </div>
+    <div id="who" class="muted"></div>
+  </header>
+
+  <main>
+    <section id="loginBox" class="card">
+      <h2>Admin login</h2>
+      <p class="muted">Student app does not show live Arduino taps. Flags and photos appear here only.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <input id="matrix" placeholder="Matrix ID" value="ADMIN" />
+        <input id="password" type="password" placeholder="Password" value="ADMIN123" />
+        <button id="loginBtn">Sign in</button>
+      </div>
+      <p id="loginErr" class="flag" style="display:none;margin-top:10px"></p>
+      <p class="muted" style="margin-top:12px">Default: <b>ADMIN</b> / <b>ADMIN123</b></p>
+    </section>
+
+    <section id="dash" style="display:none">
+      <div class="grid">
+        <div class="card"><div class="muted">Open flags</div><div class="num" id="openFlags">0</div></div>
+        <div class="card"><div class="muted">OK checks today</div><div class="num" id="okToday">0</div></div>
+        <div class="card"><div class="muted">Taps today (admin log)</div><div class="num" id="tapsToday">0</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Integrity incidents</h3>
+        <p class="muted">FLAG = rapid taps (&lt;200ms) but camera saw fewer people than taps. Photo attached when available. More heads than taps = ignored (OK).</p>
+        <table>
+          <thead>
+            <tr><th>Time</th><th>UIDs</th><th>Taps</th><th>Heads</th><th>Verdict</th><th>Photo</th><th>Action</th></tr>
+          </thead>
+          <tbody id="incidents"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>Recent RFID taps (admin log only)</h3>
+        <p class="muted">Not live-connected to the student frontend.</p>
+        <table>
+          <thead><tr><th>Time</th><th>UID</th><th>Interval</th><th>Doorway</th></tr></thead>
+          <tbody id="taps"></tbody>
+        </table>
+      </div>
+
+      <button class="ghost" id="logoutBtn">Log out</button>
+    </section>
+  </main>
+
+<script>
+  const API = location.origin + '/api';
+  let token = localStorage.getItem('cg_admin_token') || '';
+
+  function authHeaders() {
+    return { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
+  }
+
+  async function api(path, opts={}) {
+    const res = await fetch(API + path, { ...opts, headers: { ...authHeaders(), ...(opts.headers||{}) } });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  }
+
+  function showDash(on) {
+    document.getElementById('loginBox').style.display = on ? 'none' : 'block';
+    document.getElementById('dash').style.display = on ? 'block' : 'none';
+  }
+
+  document.getElementById('loginBtn').onclick = async () => {
+    const err = document.getElementById('loginErr');
+    err.style.display = 'none';
+    try {
+      const res = await fetch(API + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          matrix_id: document.getElementById('matrix').value.trim(),
+          password: document.getElementById('password').value
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+      if (data.user.role !== 'admin') throw new Error('Not an admin account');
+      token = data.token;
+      localStorage.setItem('cg_admin_token', token);
+      document.getElementById('who').textContent = data.user.name + ' · ' + data.user.matrix_id;
+      showDash(true);
+      refresh();
+    } catch (e) {
+      err.textContent = e.message;
+      err.style.display = 'block';
+    }
+  };
+
+  document.getElementById('logoutBtn').onclick = () => {
+    token = '';
+    localStorage.removeItem('cg_admin_token');
+    showDash(false);
+  };
+
+  async function review(id, status) {
+    await api('/admin/incidents/' + id + '/review', {
+      method: 'POST',
+      body: JSON.stringify({ status })
+    });
+    refresh();
+  }
+
+  async function refresh() {
+    if (!token) return;
+    try {
+      const summary = await api('/admin/summary');
+      document.getElementById('openFlags').textContent = summary.open_flags;
+      document.getElementById('okToday').textContent = summary.ok_checks_today;
+      document.getElementById('tapsToday').textContent = summary.taps_today;
+
+      const incidents = await api('/admin/incidents');
+      document.getElementById('incidents').innerHTML = incidents.map(i => `
+        <tr>
+          <td>${i.created_at || ''}</td>
+          <td>${i.uids || ''}</td>
+          <td>${i.tap_count}</td>
+          <td>${i.headcount}</td>
+          <td class="${i.verdict === 'flagged' ? 'flag' : 'ok'}">${i.verdict} · ${i.status}</td>
+          <td>${i.photo_file ? `<img class="snap" src="/incidents/${i.photo_file}" alt="snapshot" />` : '—'}</td>
+          <td>
+            ${i.status === 'open' ? `
+              <button onclick="review(${i.id},'reviewed')">Review</button>
+              <button class="ghost" onclick="review(${i.id},'dismissed')">Dismiss</button>
+            ` : (i.admin_note || '')}
+          </td>
+        </tr>
+        <tr><td colspan="7" class="muted">${i.reason || ''}</td></tr>
+      `).join('');
+
+      const taps = await api('/admin/taps');
+      document.getElementById('taps').innerHTML = taps.slice(0, 40).map(t => `
+        <tr>
+          <td>${t.tapped_at || ''}</td>
+          <td>${t.rfid_tag}</td>
+          <td>${t.interval_ms == null ? '—' : t.interval_ms + ' ms'}</td>
+          <td>${t.doorway || ''}</td>
+        </tr>
+      `).join('');
+    } catch (e) {
+      if (String(e.message).includes('Admin') || String(e.message).includes('Authentication')) {
+        showDash(false);
+      }
+    }
+  }
+
+  if (token) {
+    // validate token by loading summary
+    api('/admin/summary').then(() => {
+      showDash(true);
+      document.getElementById('who').textContent = 'Admin session';
+      refresh();
+    }).catch(() => showDash(false));
+  }
+
+  setInterval(() => { if (token) refresh(); }, 4000);
+</script>
+</body>
+</html>

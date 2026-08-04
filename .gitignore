@@ -32,3 +32,11 @@ npm-debug.log*
 # Temp
 tmp/
 temp/
+
+# Android / Capacitor
+campusgrid-system/clients/android/node_modules/
+campusgrid-system/clients/android/android/.gradle/
+campusgrid-system/clients/android/android/**/build/
+campusgrid-system/clients/android/android/local.properties
+*.apk
+*.aab

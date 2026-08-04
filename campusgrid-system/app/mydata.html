@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — My Data</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="more.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Account vault</span>
+        <h1>My Data</h1>
+      </div>
+    </div>
+
+    <div class="card" id="profileCard">
+      <div class="section-label" style="margin-top:0;">Profile (stored on server)</div>
+      <div class="settings-row"><span>Name</span><strong id="hubName">—</strong></div>
+      <div class="settings-row"><span>Matrix ID</span><strong id="hubMatrix">—</strong></div>
+      <div class="settings-row"><span>RFID</span><strong id="hubRfid">—</strong></div>
+      <div class="settings-row"><span>Face photo</span><strong id="hubFace">—</strong></div>
+      <img id="hubFaceImg" alt="" style="display:none;width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-top:10px;">
+    </div>
+
+    <div class="section-label">AI leave guidance</div>
+    <div class="card" id="guidanceCard">
+      <div class="dim-text" id="hubGuidance">Upload a timetable to get when / where / distance.</div>
+      <a href="assistant.html" class="btn" style="margin-top:12px;display:block;text-align:center;">Open Assistant</a>
+    </div>
+
+    <div class="section-label">Timetable</div>
+    <div class="card upload-card" id="hubUploadCard">
+      <div class="upload-row">
+        <div class="upload-ic">↑</div>
+        <div>
+          <div class="upload-title">Upload timetable</div>
+          <div class="upload-sub" id="hubTtSub">CSV or ICS · name, location, start, end, day</div>
+        </div>
+      </div>
+      <div class="upload-note">Saved under your user account only. Assistant uses it for leave time + distance.</div>
+    </div>
+    <div id="hubClasses"></div>
+
+    <div class="section-label">Recorded distances</div>
+    <div class="card">
+      <div class="settings-row"><span>Total logged</span><strong id="hubDistTotal">0 km</strong></div>
+      <label class="tr-sub" style="display:block;margin-top:10px;">Distance (km)</label>
+      <input id="distKm" type="number" step="0.01" min="0.01" placeholder="e.g. 0.48" style="width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit;">
+      <label class="tr-sub" style="display:block;margin-top:10px;">From → To (optional)</label>
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <input id="distFrom" type="text" placeholder="From" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit;">
+        <input id="distTo" type="text" placeholder="To" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit;">
+      </div>
+      <label class="tr-sub" style="display:block;margin-top:10px;">Note (optional)</label>
+      <input id="distNote" type="text" placeholder="Walked after Thermo" style="width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);background:transparent;color:inherit;">
+      <button class="btn solid" id="distSaveBtn" style="margin-top:14px;width:100%;">Save recorded distance</button>
+    </div>
+    <div id="hubDistances"></div>
+
+    <div class="section-label">Recent attendance</div>
+    <div id="hubAttendance"></div>
+
+    <div class="section-label">Activity</div>
+    <div id="hubActivity"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

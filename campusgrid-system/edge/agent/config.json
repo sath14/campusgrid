@@ -1,0 +1,12 @@
+{
+  "gateway_url": "http://127.0.0.1:3000",
+  "device_key": "campusgrid-edge-secret",
+  "serial_port": "",
+  "baud": 115200,
+  "doorway": "DK12-door",
+  "facility_slug": "dk12",
+  "min_tap_interval_ms": 200,
+  "webcam_index": 0,
+  "headcount_every_sec": 3,
+  "show_preview": true
+}

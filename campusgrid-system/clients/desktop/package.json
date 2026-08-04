@@ -1,0 +1,30 @@
+{
+  "name": "campusgrid-desktop",
+  "version": "1.0.0",
+  "description": "CampusGrid PC app — connects to master laptop server",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "com.campusgrid.desktop",
+    "productName": "CampusGrid",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "preload.js", "renderer/**/*"],
+    "win": {
+      "target": ["nsis"],
+      "artifactName": "CampusGrid-Setup-${version}.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}

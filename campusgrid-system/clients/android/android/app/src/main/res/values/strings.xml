@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CampusGrid</string>
+    <string name="title_activity_main">CampusGrid</string>
+    <string name="package_name">com.campusgrid.app</string>
+    <string name="custom_url_scheme">com.campusgrid.app</string>
+</resources>

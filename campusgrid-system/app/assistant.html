@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — AI Assistant</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="assistant">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="index.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Pillar 03</span>
+        <h1>AI Assistant</h1>
+      </div>
+    </div>
+
+    <div class="sync-banner">
+      <span class="sync-ic">☰</span>
+      <span>Schedule synced · 6 classes this week · RFID pace data active</span>
+    </div>
+
+    <div class="card upload-card">
+      <div class="upload-row">
+        <div class="upload-ic">↑</div>
+        <div>
+          <div class="upload-title">Upload timetable</div>
+          <div class="upload-sub">Tap to upload CSV or ICS · saved to your account</div>
+        </div>
+      </div>
+      <div class="upload-note">Assistant uses this + live RFID walkway pace to calculate leave-time alerts.</div>
+    </div>
+
+    <div class="chat-scroll" id="chatScroll">
+      <div class="bubble bot reveal">Hi Sath — I know your timetable and live walkway pace. I'll nudge you when to leave, and reroute if a path is crowded.</div>
+    </div>
+
+    <div class="prompt-row">
+      <div class="prompt-chip">When should I leave for my next class?</div>
+      <div class="prompt-chip">How far is my next class?</div>
+      <div class="prompt-chip">Where's my next class?</div>
+      <div class="prompt-chip">Is Block C walkway crowded?</div>
+      <div class="prompt-chip">Find me a quiet room now</div>
+      <div class="prompt-chip">Where is my data stored?</div>
+    </div>
+  </div>
+
+  <div class="chat-input-row">
+    <input type="text" placeholder="Ask CampusGrid…">
+    <button>➤</button>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
