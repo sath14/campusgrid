@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Accessibility</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="more.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Pillar 04</span>
+        <h1>Accessibility</h1>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="toggle-row" data-pref="avoid_stairs">
+        <div>
+          <div class="tr-title">Avoid stairs</div>
+          <div class="tr-sub">Route only through lifts and ramps</div>
+        </div>
+        <div class="switch on"><div class="knob"></div></div>
+      </div>
+      <div class="toggle-row" data-pref="shaded_paths">
+        <div>
+          <div class="tr-title">Prefer shaded paths</div>
+          <div class="tr-sub">Reduce outdoor sun exposure</div>
+        </div>
+        <div class="switch"><div class="knob"></div></div>
+      </div>
+      <div class="toggle-row" data-pref="voice_guidance">
+        <div>
+          <div class="tr-title">Announce route aloud</div>
+          <div class="tr-sub">Voice guidance while walking</div>
+        </div>
+        <div class="switch"><div class="knob"></div></div>
+      </div>
+    </div>
+
+    <div class="section-label">Preview: Route to Dewan Utama</div>
+    <div class="route-steps">
+      <div class="route-line"></div>
+      <div class="route-step">
+        <div class="route-dot">1</div>
+        <div>
+          <div class="rs-title">Ramp exit — Block A, East</div>
+          <div class="rs-sub">Step-free from ground level</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-dot">2</div>
+        <div>
+          <div class="rs-title">Lift to Level 1, covered walkway</div>
+          <div class="rs-sub">Avoids the Block C stairwell</div>
+        </div>
+      </div>
+      <div class="route-step">
+        <div class="route-dot">✓</div>
+        <div>
+          <div class="rs-title">Arrive at Dewan Utama, side entrance</div>
+          <div class="rs-sub">Step-free access, adds ~3 min</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Accessible Entrances Nearby</div>
+    <div class="list-item">
+      <div class="li-icon">♿</div>
+      <div class="li-body">
+        <div class="li-title">Block A — East Ramp</div>
+        <div class="li-sub">Level access, automatic doors</div>
+      </div>
+      <div class="li-tag free">Open</div>
+    </div>
+    <div class="list-item">
+      <div class="li-icon">♿</div>
+      <div class="li-body">
+        <div class="li-title">Library — Lift Lobby</div>
+        <div class="li-sub">Serves all 3 levels</div>
+      </div>
+      <div class="li-tag free">Open</div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <a href="navigation.html" class="btn solid" style="display:flex;">Start Accessible Route</a>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
