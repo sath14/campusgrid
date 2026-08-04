@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Settings</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="more.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Account</span>
+        <h1>Settings</h1>
+      </div>
+    </div>
+
+    <div class="card" id="accountCard">
+      <div class="section-label" style="margin-top:0;">Profile</div>
+      <div class="settings-row"><span>Name</span><strong id="setName">—</strong></div>
+      <div class="settings-row"><span>Email</span><strong id="setEmail">—</strong></div>
+      <div class="settings-row"><span>RFID Tag</span><strong id="setRfid">—</strong></div>
+      <a href="mydata.html" class="btn" style="margin-top:14px;display:block;text-align:center;">Open My Data hub</a>
+    </div>
+
+    <div class="section-label">Notifications & Privacy</div>
+    <div class="card">
+      <div class="toggle-row" data-pref="notifications_enabled">
+        <div><div class="tr-title">Push notifications</div><div class="tr-sub">Leave-time alerts & occupancy updates</div></div>
+        <div class="switch on"><div class="knob"></div></div>
+      </div>
+      <div class="toggle-row" data-pref="show_name_leaderboard">
+        <div><div class="tr-title">Show name on leaderboard</div><div class="tr-sub">Off = anonymous on sustainability rankings</div></div>
+        <div class="switch on"><div class="knob"></div></div>
+      </div>
+      <div class="toggle-row" data-pref="green_routes">
+        <div><div class="tr-title">Prefer green routes</div><div class="tr-sub">Walking paths over shuttle where possible</div></div>
+        <div class="switch on"><div class="knob"></div></div>
+      </div>
+    </div>
+
+    <div class="section-label">Activity Log</div>
+    <div id="logList"></div>
+
+    <button class="btn" id="logoutBtn" style="margin-top:20px; border-color:var(--danger); color:var(--danger);">Sign Out</button>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

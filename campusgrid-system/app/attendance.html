@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Smart Attendance</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="more.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Core System</span>
+        <h1>Smart Attendance</h1>
+      </div>
+    </div>
+
+    <div class="updated-row"><span class="live-dot"></span> RFID live · Updated <span class="live-seconds">0s ago</span></div>
+
+    <div class="hero-card">
+      <div class="hero-label">Your status today</div>
+      <div class="hero-stat">Present · 4 / 4 classes</div>
+      <div class="hero-sub">Last tap: DK12 doorway · 2:14 pm</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="num count-up" data-target="847" data-suffix="">0</div>
+        <div class="lbl">People on grid now</div>
+      </div>
+      <div class="stat-box">
+        <div class="num count-up" data-target="38" data-suffix="">0</div>
+        <div class="lbl">Doorways active</div>
+      </div>
+    </div>
+
+    <div class="section-label">Live Occupancy · per minute</div>
+
+    <div class="occ-card">
+      <div class="occ-head">
+        <div>
+          <div class="occ-title">DK12 — Lecture Hall</div>
+          <div class="occ-sub">Thermodynamics II · 142 / 180 seats</div>
+        </div>
+        <div class="li-tag busy">Busy</div>
+      </div>
+      <div class="occ-bar"><div class="occ-fill" style="width:79%;"></div></div>
+      <div class="occ-meta">RFID snapshot · 142 people · 1 min ago</div>
+    </div>
+
+    <div class="occ-card">
+      <div class="occ-head">
+        <div>
+          <div class="occ-title">Fluid Mechanics Lab</div>
+          <div class="occ-sub">Block D · 18 / 24 stations</div>
+        </div>
+        <div class="li-tag free">Moderate</div>
+      </div>
+      <div class="occ-bar"><div class="occ-fill moderate" style="width:75%;"></div></div>
+      <div class="occ-meta">RFID snapshot · 18 people · 1 min ago</div>
+    </div>
+
+    <div class="occ-card">
+      <div class="occ-head">
+        <div>
+          <div class="occ-title">Tutorial Room T3</div>
+          <div class="occ-sub">Calculus II · 28 / 30 seats</div>
+        </div>
+        <div class="li-tag busy">Full</div>
+      </div>
+      <div class="occ-bar"><div class="occ-fill full" style="width:93%;"></div></div>
+      <div class="occ-meta">RFID snapshot · 28 people · 1 min ago</div>
+    </div>
+
+    <div class="section-label">How it works</div>
+
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div>
+          <div class="flow-title">Tap in</div>
+          <div class="flow-sub">Student ID card (passive UHF RFID) read at every lecture hall, tutorial, lab & workshop doorway.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div>
+          <div class="flow-title">Instant sync</div>
+          <div class="flow-sub">Tag ID, door ID & timestamp publish to the grid backend via MQTT — under 2 seconds.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div>
+          <div class="flow-title">Auto-logged</div>
+          <div class="flow-sub">Tap matched against timetable → attendance record. Room count snapshotted every 60 seconds.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div>
+          <div class="flow-title">Anti-tailgate check</div>
+          <div class="flow-sub">Ceiling camera counts bodies crossing. If 2 RFID tags but 1 person on video, both tags flagged — no auto-penalty, review only.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Integrity alerts</div>
+
+    <div class="flag-card">
+      <div class="flag-icon">⚠</div>
+      <div>
+        <div class="flag-title">Doorway DK12-B · 2:08 pm</div>
+        <div class="flag-sub">2 RFID reads · 1 body on camera — flagged for admin review</div>
+      </div>
+    </div>
+
+    <div class="card dim-card">
+      <div class="dim-title">Privacy note</div>
+      <div class="dim-text">Cameras perform headcount only — no facial recognition, no video stored. Only the count mismatch flag is retained.</div>
+    </div>
+
+    <a href="infrastructure.html" class="btn" style="margin-top:8px;">View system architecture →</a>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

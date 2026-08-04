@@ -1,0 +1,12 @@
+{
+  "appId": "com.campusgrid.app",
+  "appName": "CampusGrid",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

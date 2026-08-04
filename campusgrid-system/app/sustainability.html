@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Sustainability</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="more.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Pillar 06</span>
+        <h1>Sustainability</h1>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center;">
+      <div class="section-label" style="margin-top:0; justify-content:center;">Walkability Score</div>
+      <div class="gauge-wrap">
+        <svg width="160" height="90" viewBox="0 0 160 90">
+          <path d="M10,80 A70,70 0 0,1 150,80" fill="none" stroke="rgba(191,244,240,0.14)" stroke-width="10" stroke-linecap="round"/>
+          <path d="M10,80 A70,70 0 0,1 120,25" fill="none" stroke="#2fe0e6" stroke-width="10" stroke-linecap="round"/>
+        </svg>
+        <div class="gauge-num count-up" data-target="82" data-suffix="">0</div>
+        <div class="gauge-lbl">out of 100 · this week</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="num count-up" data-target="4" data-suffix=" kg">0 kg</div>
+        <div class="lbl">CO₂ saved this week</div>
+      </div>
+      <div class="stat-box">
+        <div class="num count-up" data-target="6" data-suffix=".2 km">0 km</div>
+        <div class="lbl">Walked via CampusGrid</div>
+      </div>
+    </div>
+
+    <div class="section-label">
+      Weekly Steps Leaderboard
+      <span class="see-all" style="font-size:10px;">RFID-tracked</span>
+    </div>
+
+    <div class="toggle-row" data-pref="show_name_leaderboard" style="border-bottom:none; margin-bottom:12px;">
+      <div>
+        <div class="tr-title">Show my name on leaderboard</div>
+        <div class="tr-sub">Off = anonymous · On = visible to campus</div>
+      </div>
+      <div class="switch on"><div class="knob"></div></div>
+    </div>
+
+    <div class="leader-row">
+      <div class="leader-rank">1</div>
+      <div class="leader-body">
+        <div class="leader-name">Student #2847</div>
+        <div class="leader-steps">14,820 steps</div>
+      </div>
+    </div>
+    <div class="leader-row you">
+      <div class="leader-rank">2</div>
+      <div class="leader-body">
+        <div class="leader-name">Sath (you)</div>
+        <div class="leader-steps">12,640 steps</div>
+      </div>
+    </div>
+    <div class="leader-row">
+      <div class="leader-rank dim-rank">3</div>
+      <div class="leader-body">
+        <div class="leader-name">Student #1093</div>
+        <div class="leader-steps">11,205 steps</div>
+      </div>
+    </div>
+    <div class="leader-row">
+      <div class="leader-rank dim-rank">4</div>
+      <div class="leader-body">
+        <div class="leader-name">Anonymous</div>
+        <div class="leader-steps">9,870 steps</div>
+      </div>
+    </div>
+
+    <div class="section-label">Weekly Walking Distance</div>
+    <div class="bar-chart">
+      <div class="bar" style="height:40%;"><span>1.1</span></div>
+      <div class="bar" style="height:65%;"><span>1.8</span></div>
+      <div class="bar" style="height:30%;"><span>0.8</span></div>
+      <div class="bar" style="height:80%;"><span>2.2</span></div>
+      <div class="bar" style="height:55%;"><span>1.5</span></div>
+      <div class="bar" style="height:20%;"><span>0.5</span></div>
+      <div class="bar" style="height:15%;"><span>0.4</span></div>
+    </div>
+    <div class="bar-chart-lbls">
+      <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+    </div>
+
+    <div class="toggle-row" data-pref="green_routes" style="margin-top:20px;">
+      <div>
+        <div class="tr-title">Prefer green routes</div>
+        <div class="tr-sub">Choose walking paths over shuttle where possible</div>
+      </div>
+      <div class="switch on"><div class="knob"></div></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

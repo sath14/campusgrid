@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CampusGrid</title>
+<style>
+  :root {
+    --bg: #0c1412;
+    --card: #15201c;
+    --line: #2a3d36;
+    --foam: #e8f2ee;
+    --dim: #8aa399;
+    --accent: #3d9b7a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(120% 80% at 50% 0%, #1a2e28 0%, var(--bg) 55%);
+    color: var(--foam);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .wrap { width: 100%; max-width: 400px; }
+  h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  p { color: var(--dim); margin: 0 0 20px; line-height: 1.45; font-size: 14px; }
+  label { display: block; font-size: 12px; color: var(--dim); margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 14px 14px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--card); color: var(--foam);
+    font-size: 16px; margin-bottom: 14px;
+  }
+  button {
+    width: 100%; padding: 14px; border: 0; border-radius: 12px;
+    background: var(--accent); color: #04140f; font-weight: 700; font-size: 15px;
+  }
+  .hint { font-size: 12px; color: var(--dim); margin-top: 14px; line-height: 1.4; }
+  .err { color: #f07178; font-size: 13px; min-height: 1.2em; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>CampusGrid</h1>
+    <p>Connect to the master laptop running CampusGrid (same Wi‑Fi).</p>
+    <label for="url">Server address</label>
+    <input id="url" type="url" placeholder="http://192.168.0.10:3000" autocomplete="off">
+    <div class="err" id="err"></div>
+    <button id="go" type="button">Open CampusGrid</button>
+    <p class="hint">
+      On the master PC run <b>START.bat</b>, then use that PC’s LAN IP.<br>
+      Example: <code>http://192.168.1.5:3000</code>
+    </p>
+  </div>
+  <script>
+    const KEY = 'cg_server_url';
+    const input = document.getElementById('url');
+    const err = document.getElementById('err');
+    input.value = localStorage.getItem(KEY) || 'http://192.168.0.10:3000';
+
+    document.getElementById('go').addEventListener('click', () => {
+      err.textContent = '';
+      let url = (input.value || '').trim().replace(/\/$/, '');
+      if (!/^https?:\/\//i.test(url)) url = 'http://' + url;
+      try {
+        const u = new URL(url);
+        if (!u.port) u.port = '3000';
+        url = u.origin;
+      } catch {
+        err.textContent = 'Enter a valid address like http://192.168.1.5:3000';
+        return;
+      }
+      localStorage.setItem(KEY, url);
+      window.location.href = url + '/login.html';
+    });
+  </script>
+</body>
+</html>
