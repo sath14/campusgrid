@@ -58,10 +58,17 @@ Recommended daily-driver design.
 - Suggested: PETG or PLA+, 15–20% infill, 3 walls; more infill in Design 3 ballast
 - Check your phone width/thickness and scale XY if using a thick case
 
+## CAD files (AutoCAD)
+
+Each design also has:
+- `.dwg` — AutoCAD 2000 drawing (front / top / side views + dimensions)
+- `.dxf` — same content, openable in almost any CAD tool
+
 ## Generate again
 
 ```bash
-python3 generate_holders.py
+python3 generate_holders.py   # STL meshes
+python3 generate_dwg.py       # DXF + DWG drawings
 ```
 
-Requires: `numpy`, `trimesh`, `numpy-stl`, `manifold3d`.
+Requires: `numpy`, `trimesh`, `numpy-stl`, `manifold3d`, `ezdxf`, and LibreDWG `dwgwrite` on `PATH` (for `.dwg`).
