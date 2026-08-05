@@ -60,15 +60,24 @@ Recommended daily-driver design.
 
 ## CAD files (AutoCAD)
 
-Each design also has:
-- `.dwg` — AutoCAD 2000 drawing (front / top / side views + dimensions)
-- `.dxf` — same content, openable in almost any CAD tool
+### Orthographic drawings (complete dimensions) — use these
+| File | Contents |
+|------|----------|
+| `design1_orthographic.dwg` / `.dxf` | Front / Top / Right side + full dim list |
+| `design2_orthographic.dwg` / `.dxf` | Front / Top / Right side + full dim list |
+| `design3_orthographic.dwg` / `.dxf` | Front / Top / Right side + full dim list |
+
+### Earlier simpler drawings
+`design1_l_stand_redo.dwg`, `design2_upright_cradle.dwg`, `design3_best_angled_stand.dwg` (+ `.dxf`)
+
+DWG format is AutoCAD 2000. Open the matching `.dxf` if your CAD app prefers it.
 
 ## Generate again
 
 ```bash
-python3 generate_holders.py   # STL meshes
-python3 generate_dwg.py       # DXF + DWG drawings
+python3 generate_holders.py        # STL meshes
+python3 generate_dwg.py            # simpler DWG/DXF
+python3 generate_orthographic.py   # full orthographic DWG/DXF
 ```
 
 Requires: `numpy`, `trimesh`, `numpy-stl`, `manifold3d`, `ezdxf`, and LibreDWG `dwgwrite` on `PATH` (for `.dwg`).
