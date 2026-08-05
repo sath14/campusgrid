@@ -48,61 +48,79 @@ def difference(base, cutters):
 
 
 # ---------------------------------------------------------------------------
-# Design 1 — redo of the user's L-stand (front slab + backrest + lip)
-# Flaws (documented in README): still 90° viewing angle; tall back can tip;
-# cable slot is fixed to center; no wireless pad recess.
+# Design 1 — desk phone stand + dual pencil holders (redo of user's design)
+# Base 180 mm wide; hollow rect + cylinder cups (170 mm tall) act as the
+# phone backrest; front lip; simple top cable groove (not a plus cutout).
+# Flaws: vertical lean only; tall cups can tip a light base; groove is
+# center-only; cups take desk space; no wireless pad.
 # ---------------------------------------------------------------------------
 def design1_l_stand() -> trimesh.Trimesh:
-    base_w = 95
-    base_d = 85
-    base_h = 10  # matches user's "10" thickness callout
-    back_h = 115
-    back_t = 8
-    lip_h = 10
+    # User specs (cm → mm)
+    base_w = 180  # 18 cm
+    base_d = 100
+    base_h = 10  # from original drawing callout
+    holder_h = 170  # 17 cm
+    wall = 2.5
+
+    # Rectangular pencil holder (left)
+    rect_w, rect_d = 55, 42
+    # Cylindrical pencil holder (right)
+    cyl_r_outer = 22
+    cyl_r_inner = cyl_r_outer - wall
+
+    lip_h = 9
     lip_t = 6
-    slot_w = 14  # charging cable / connector clearance
-    slot_d = 28
+    # Simple cable groove — cable lies in this slot (not a plus)
+    groove_w = 8
+    groove_depth = 4
+    groove_len = base_d - 18  # runs front→back under phone area
+
+    margin = 8
+    # Place both holders at the rear so phone can lean on their front faces
+    rect_x = -(base_w / 2) + margin + rect_w / 2
+    rect_y = -(base_d / 2) + margin + rect_d / 2
+    cyl_x = base_w / 2 - margin - cyl_r_outer
+    cyl_y = -(base_d / 2) + margin + cyl_r_outer
+
+    # Align front faces of both holders so the phone rests evenly
+    holder_front_y = max(rect_y + rect_d / 2, cyl_y + cyl_r_outer)
+    rect_y = holder_front_y - rect_d / 2
+    cyl_y = holder_front_y - cyl_r_outer
 
     base = box([base_w, base_d, base_h])
     base.apply_translation([0, 0, base_h / 2])
 
-    # Rectangular backrest (left portion of user's front-view pair)
-    back_w = base_w - 28
-    back = box([back_w, back_t, back_h])
-    back.apply_translation(
-        [-(base_w - back_w) / 2, -(base_d / 2 - back_t / 2), base_h + back_h / 2]
-    )
+    # --- Rectangular pencil cup (hollow, open top) ---
+    rect_outer = box([rect_w, rect_d, holder_h])
+    rect_outer.apply_translation([rect_x, rect_y, base_h + holder_h / 2])
+    rect_inner = box([rect_w - 2 * wall, rect_d - 2 * wall, holder_h])
+    # Leave a floor in the cup
+    rect_inner.apply_translation([rect_x, rect_y, base_h + wall + (holder_h - wall) / 2])
 
-    # Vertical cylindrical pillar on the right (matches user's front view)
-    # Kept behind the phone plane so it does not block the resting face
-    accent_r = 13
-    accent = cylinder(radius=accent_r, height=back_h, sections=48)
-    accent.apply_translation(
-        [
-            base_w / 2 - accent_r,
-            -(base_d / 2 - accent_r),
-            base_h + back_h / 2,
-        ]
-    )
+    # --- Cylindrical pencil cup (hollow, open top) ---
+    cyl_outer = cylinder(radius=cyl_r_outer, height=holder_h, sections=64)
+    cyl_outer.apply_translation([cyl_x, cyl_y, base_h + holder_h / 2])
+    cyl_inner = cylinder(radius=cyl_r_inner, height=holder_h, sections=64)
+    cyl_inner.apply_translation([cyl_x, cyl_y, base_h + wall + (holder_h - wall) / 2])
 
+    # Front lip — stops phone from sliding off
     lip = box([base_w, lip_t, lip_h])
     lip.apply_translation([0, base_d / 2 - lip_t / 2, base_h + lip_h / 2])
 
-    body = union([base, back, accent, lip])
+    body = union([base, rect_outer, cyl_outer, lip])
+    body = difference(body, [rect_inner, cyl_inner])
 
-    # Cable passthrough in base (front-to-back under phone resting area)
-    slot = box([slot_w, slot_d + 20, base_h + 4])
-    slot.apply_translation([0, 8, base_h / 2])
+    # Top groove in the base: cable lies inside (open upward, not a through-plus)
+    groove = box([groove_w, groove_len, groove_depth + 0.2])
+    groove.apply_translation(
+        [0, (base_d / 2 - lip_t) - groove_len / 2 - 2, base_h - groove_depth / 2]
+    )
 
-    # Vertical notch in lip so Lightning/USB-C cable can sit while phone rests
-    lip_notch = box([slot_w, lip_t + 4, lip_h + 4])
-    lip_notch.apply_translation([0, base_d / 2 - lip_t / 2, base_h + lip_h / 2])
+    # Small lip gap so the cable can rise to the phone port
+    lip_gap = box([groove_w, lip_t + 2, lip_h + 2])
+    lip_gap.apply_translation([0, base_d / 2 - lip_t / 2, base_h + lip_h / 2])
 
-    # Rear exit under backrest for cable routing off the desk edge
-    rear_exit = box([slot_w, back_t + 8, 6])
-    rear_exit.apply_translation([0, -(base_d / 2 - back_t / 2), 3])
-
-    return difference(body, [slot, lip_notch, rear_exit])
+    return difference(body, [groove, lip_gap])
 
 
 # ---------------------------------------------------------------------------

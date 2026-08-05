@@ -3,22 +3,23 @@
 Three 3D-printable phone holders with charging access. Units are millimeters.
 Sized for a typical phone with case (~78 × 12 × 160 mm). Scale in your slicer if needed.
 
-## Design 1 — L-stand redo (`design1_l_stand_redo.stl`)
+## Design 1 — Dual pencil-holder stand (`design1_l_stand_redo.stl`)
 
-Redo of your first design (front slab + tall back + front lip), with charging added.
+Redo of your first design with corrected intent.
 
-**What changed from your sketch**
-- Kept the **10 mm** base thickness and L-profile (vertical back + deck + lip)
-- Added a **center cable slot** through the base and a **lip notch** for Lightning/USB-C
-- Added a **rear cable exit** under the backrest
-- Kept a **cylindrical accent** on the right (from your front view)
+**Your layout (as clarified)**
+- Base **18 cm** wide, **10 mm** thick
+- **Rectangular hollow cup** + **cylindrical hollow cup** — both pencil holders, **17 cm** tall
+- Phone **leans against the pencil holders**
+- Front **lip** stops the phone from slipping
+- **Simple cable groove** in the base top — the cable lies in the slot (not a plus-shaped cutout); small gap in the lip so the cable can reach the port
 
 **Flaws (why this is not the best)**
-1. Backrest is still **90° vertical** — awkward viewing angle, phone wants to tip forward against the lip only
-2. Tall back + shallow mass distribution can feel **top-heavy** with a large phone
-3. Cable path is **fixed to center** — bad for landscape or offset ports
-4. **No wireless / MagSafe pad recess** — wired only
-5. Right-side cylinder is mostly cosmetic (echoes your sketch) and adds print time without much function
+1. Phone leans on **vertical** cups — viewing angle is steep / near 90°
+2. Tall 17 cm holders on a thin base can feel **top-heavy** when the phone pushes forward
+3. Cable groove is **center-only** — awkward for landscape or offset ports
+4. Cups take desk space; gap between rect and cylinder means the phone may only touch one holder cleanly depending on width
+5. **No wireless / MagSafe pad** — wired groove only
 
 ## Design 2 — Upright cradle (`design2_upright_cradle.stl`)
 
@@ -51,9 +52,10 @@ Recommended daily-driver design.
 - Foot recesses for optional rubber pads
 
 **Print notes**
-- Print Design 1 & 2 flat on the base (no supports if oriented carefully)
-- Design 3: print on the base; add supports under the tilted backrest if your slicer needs them
-- Suggested: PETG or PLA+, 15–20% infill, 3 walls; higher infill in the ballast for Design 3
+- Design 1: print on the base; cups are open-top hollow (no supports inside if printed upright)
+- Design 2: print on the base
+- Design 3: print on the base; add supports under the tilted backrest if needed
+- Suggested: PETG or PLA+, 15–20% infill, 3 walls; more infill in Design 3 ballast
 - Check your phone width/thickness and scale XY if using a thick case
 
 ## Generate again
