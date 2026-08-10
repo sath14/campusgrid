@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — Sign In</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .steps{ margin:12px 0 16px; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--card); }
+  .steps ol{ margin:8px 0 0 18px; color:var(--foam); font-size:13px; line-height:1.45; }
+  .steps li{ margin-bottom:6px; }
+  .hint{ color:var(--dim); font-size:12px; margin:4px 0 10px; }
+  #regName{ text-transform:uppercase; }
+  .photo-box{ margin:8px 0 14px; }
+  .photo-box input[type=file]{ width:100%; color:var(--sand); font-size:12px; }
+  .device{ max-width:100%; }
+  @media (max-width:420px){
+    body{ padding:0; align-items:stretch; }
+    .device{ width:100%; height:100vh; max-height:100vh; border-radius:0; box-shadow:none; border:none; }
+    .device::before{ display:none; }
+  }
+</style>
+</head>
+<body data-page="login" data-no-auth>
+
+<div class="device">
+  <div class="statusbar">
+    <span>CampusGrid</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="brand-row" style="margin-top:28px;">
+      <div class="brand-dotgrid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <span class="eyebrow" style="margin:0;">CampusGrid Local</span>
+    </div>
+    <div class="greeting" style="font-size:28px;">Sign in</div>
+    <div class="subgreeting">Use your Matrix ID. Password is your Matrix ID.</div>
+
+    <form id="loginForm" class="auth-form">
+      <div class="search-bar" style="margin-bottom:10px;">
+        <span class="ic">#</span>
+        <input type="text" id="matrixId" placeholder="Matrix ID (e.g. A22EC1234)" autocomplete="username" required>
+      </div>
+      <div class="search-bar" style="margin-bottom:16px;">
+        <span class="ic">•</span>
+        <input type="password" id="password" placeholder="Password (= Matrix ID)" autocomplete="current-password" required>
+      </div>
+      <div id="loginError" class="auth-error" style="display:none;"></div>
+      <button type="submit" class="btn solid" id="loginBtn">Sign In</button>
+    </form>
+
+    <div class="auth-switch">
+      No account? <a href="#" id="showRegister">Register (RFID + photo)</a>
+    </div>
+
+    <form id="registerForm" class="auth-form" style="display:none;" enctype="multipart/form-data">
+      <div class="steps">
+        <div class="dim-title">Registration checklist</div>
+        <ol>
+          <li><b>NAME</b> — type in <b>CAPITAL LETTERS</b> only (example: <code>SATH KUMAR</code>).</li>
+          <li><b>MATRIX ID</b> — this is also your <b>password</b>.</li>
+          <li><b>RFID UID</b> — tap your card on the Arduino reader, copy the UID from Serial Monitor (115200) or PC agent, paste here (example: <code>C3ABA12C</code>).</li>
+          <li><b>PHOTO</b> — clear front-facing face photo (no sunglasses). This photo is linked to your RFID for face checks.</li>
+        </ol>
+      </div>
+
+      <div class="hint">1) Full name (CAPITAL LETTERS)</div>
+      <div class="search-bar" style="margin-bottom:10px;">
+        <span class="ic">◎</span>
+        <input type="text" id="regName" placeholder="YOUR FULL NAME" required>
+      </div>
+
+      <div class="hint">2) Matrix ID (= password)</div>
+      <div class="search-bar" style="margin-bottom:10px;">
+        <span class="ic">#</span>
+        <input type="text" id="regMatrix" placeholder="A22EC1234" required>
+      </div>
+
+      <div class="hint">3) RFID card UID (from reader)</div>
+      <div class="search-bar" style="margin-bottom:10px;">
+        <span class="ic">▣</span>
+        <input type="text" id="regRfid" placeholder="C3ABA12C" required>
+      </div>
+
+      <div class="hint">4) Face photo linked to this person</div>
+      <div class="photo-box">
+        <input type="file" id="regPhoto" accept="image/*" capture="user" required>
+      </div>
+
+      <div id="regError" class="auth-error" style="display:none;"></div>
+      <button type="submit" class="btn solid">Create account</button>
+      <div class="auth-switch" style="margin-top:14px;">
+        Have an account? <a href="#" id="showLogin">Sign in</a>
+      </div>
+    </form>
+
+    <div class="card dim-card" style="margin-top:20px;">
+      <div class="dim-title">Demo account</div>
+      <div class="dim-text">Matrix: <b>A22DEMO001</b><br>Password: <b>A22DEMO001</b><br>RFID linked: C3ABA12C</div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script>
+if (CampusAPI.getToken()) window.location.href = 'index.html';
+
+const regName = document.getElementById('regName');
+regName.addEventListener('input', () => {
+  const start = regName.selectionStart;
+  regName.value = regName.value.toUpperCase();
+  regName.setSelectionRange(start, start);
+});
+
+document.getElementById('showRegister').onclick = e => {
+  e.preventDefault();
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'block';
+};
+document.getElementById('showLogin').onclick = e => {
+  e.preventDefault();
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('loginForm').style.display = 'block';
+};
+
+document.getElementById('loginForm').onsubmit = async e => {
+  e.preventDefault();
+  const err = document.getElementById('loginError');
+  err.style.display = 'none';
+  try {
+    const data = await CampusAPI.login(
+      document.getElementById('matrixId').value.trim(),
+      document.getElementById('password').value
+    );
+    CampusAPI.setToken(data.token);
+    CampusAPI.setUser(data.user);
+    window.location.href = 'index.html';
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.style.display = 'block';
+  }
+};
+
+document.getElementById('registerForm').onsubmit = async e => {
+  e.preventDefault();
+  const err = document.getElementById('regError');
+  err.style.display = 'none';
+  try {
+    const name = document.getElementById('regName').value.trim().toUpperCase();
+    if (name !== name.toUpperCase() || /[a-z]/.test(document.getElementById('regName').value)) {
+      // already forced uppercase via input handler
+    }
+    if (!/^[A-Z]+(?:[ A-Z.'-]*[A-Z])?$/.test(name)) {
+      throw new Error('Name must be CAPITAL LETTERS only');
+    }
+    const fd = new FormData();
+    fd.append('name', name);
+    fd.append('matrix_id', document.getElementById('regMatrix').value.trim().toUpperCase());
+    fd.append('rfid_tag', document.getElementById('regRfid').value.trim().toUpperCase());
+    const photo = document.getElementById('regPhoto').files[0];
+    if (!photo) throw new Error('Please choose a face photo');
+    fd.append('photo', photo);
+
+    const data = await CampusAPI.registerForm(fd);
+    CampusAPI.setToken(data.token);
+    CampusAPI.setUser(data.user);
+    alert('Registered!\n\nLogin Matrix ID: ' + data.user.matrix_id + '\nPassword: your Matrix ID\nRFID: ' + data.user.rfid_tag);
+    window.location.href = 'index.html';
+  } catch (ex) {
+    err.textContent = ex.message;
+    err.style.display = 'block';
+  }
+};
+</script>
+</body>
+</html>

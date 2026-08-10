@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CampusGrid Edge Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a222c;
+      --text: #e8eef4;
+      --muted: #8b9aab;
+      --accent: #3d9bfd;
+      --ok: #3ecf8e;
+      --warn: #f5a524;
+      --bad: #f07178;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #1c2a3a, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+    h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    .sub { color: var(--muted); margin-bottom: 20px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid #2a3542;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .card .lbl { color: var(--muted); font-size: 0.8rem; }
+    .card .num { font-size: 1.8rem; font-weight: 700; margin-top: 6px; }
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #2a3542; }
+    th { color: var(--muted); font-weight: 600; }
+    .flag { color: var(--bad); font-weight: 700; }
+    .ok { color: var(--ok); }
+    @media (max-width: 900px) {
+      .grid, .cols { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <h1>CampusGrid Edge</h1>
+  <p class="sub">Local RFID + webcam headcount · rapid-tap flags (&lt; 200 ms)</p>
+
+  <div class="grid">
+    <div class="card"><div class="lbl">Doorway</div><div class="num" id="doorway">—</div></div>
+    <div class="card"><div class="lbl">RFID taps today</div><div class="num" id="rfid">0</div></div>
+    <div class="card"><div class="lbl">Webcam people</div><div class="num" id="people">0</div></div>
+    <div class="card"><div class="lbl">Flags today</div><div class="num" id="flags">0</div></div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h3>Recent taps</h3>
+      <table>
+        <thead><tr><th>Time</th><th>UID</th><th>Interval</th><th>Flag</th></tr></thead>
+        <tbody id="taps"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Rapid-tap flags</h3>
+      <table>
+        <thead><tr><th>Time</th><th>UIDs</th><th>ms</th></tr></thead>
+        <tbody id="flagRows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    function fmtTime(ts) {
+      if (!ts) return '—';
+      return new Date(ts).toLocaleTimeString();
+    }
+
+    async function refresh() {
+      const res = await fetch('/api/edge/live-status');
+      const data = await res.json();
+      document.getElementById('doorway').textContent = data.doorway || '—';
+      document.getElementById('rfid').textContent = data.rfid_today ?? 0;
+      document.getElementById('people').textContent = data.last_headcount?.count ?? 0;
+      document.getElementById('flags').textContent = data.flags_today ?? 0;
+
+      document.getElementById('taps').innerHTML = (data.recent_taps || []).map(t => `
+        <tr>
+          <td>${fmtTime(t.ts)}</td>
+          <td>${t.uid}</td>
+          <td>${t.interval_ms == null ? '—' : t.interval_ms + ' ms'}</td>
+          <td class="${t.flagged ? 'flag' : 'ok'}">${t.flagged ? 'FLAG' : 'ok'}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('flagRows').innerHTML = (data.recent_flags || []).map(f => `
+        <tr>
+          <td>${fmtTime(f.ts)}</td>
+          <td>${(f.uids || []).join(' + ')}</td>
+          <td class="flag">${f.interval_ms} ms</td>
+        </tr>
+      `).join('');
+    }
+
+    refresh();
+    setInterval(refresh, 2000);
+  </script>
+</body>
+</html>

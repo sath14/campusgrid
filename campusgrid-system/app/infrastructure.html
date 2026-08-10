@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid — System Architecture</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="more">
+
+<div class="device">
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="screen">
+    <div class="screen-bg"></div>
+
+    <div class="app-header">
+      <a href="attendance.html" class="back">‹</a>
+      <div style="text-align:right;">
+        <span class="eyebrow">Technical Spec</span>
+        <h1>Architecture</h1>
+      </div>
+    </div>
+
+    <div class="section-label">Edge · Sensors & Hardware</div>
+
+    <div class="infra-card">
+      <div class="infra-tag">Tags</div>
+      <div class="infra-title">Passive UHF RFID in student ID</div>
+      <div class="infra-sub">EPC Gen2 / ISO 18000-6C inlay embedded in existing campus card. No battery, no new card issued. Read range ~3 m at doorway.</div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-tag">Readers</div>
+      <div class="infra-title">Fixed UHF RFID readers</div>
+      <div class="infra-sub">PoE-powered, one per doorway (halls, tutorials, labs, workshops) + secondary checkpoints along main walkways for pace tracking.</div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-tag">Cameras</div>
+      <div class="infra-title">Ceiling headcount sensors</div>
+      <div class="infra-sub">Low-res wide-angle, doorway-mounted. Lightweight person-count model on edge — transmits count only, never raw video.</div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-tag">Edge compute</div>
+      <div class="infra-title">Raspberry Pi 4 / Jetson Nano</div>
+      <div class="infra-sub">One board per doorway cluster. Runs headcount model + local MQTT publisher. OS: Raspberry Pi OS or Ubuntu Core.</div>
+    </div>
+
+    <div class="section-label">Backend · Server Layer</div>
+
+    <div class="infra-card">
+      <div class="infra-tag">Ingestion</div>
+      <div class="infra-title">MQTT broker (Eclipse Mosquitto)</div>
+      <div class="infra-sub">Thousands of small, frequent publishes from readers — natural fit vs REST polling.</div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-tag">Processing</div>
+      <div class="infra-title">Stream consumer service</div>
+      <div class="infra-sub">Aggregates taps → per-minute occupancy. Computes walkway pace (time-of-flight between checkpoints). Reconciles RFID count vs camera headcount.</div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-tag">Storage</div>
+      <div class="infra-title">TimescaleDB + PostgreSQL</div>
+      <div class="infra-sub">Time-series DB for occupancy & pace pings. Relational DB for timetables, attendance, directory, flagged-tag cases.</div>
+    </div>
+
+    <div class="infra-card">
+      <div class="infra-tag">API</div>
+      <div class="infra-title">REST / GraphQL app service</div>
+      <div class="infra-sub">Serves mobile app: directory, navigation, attendance, real-time data, sustainability leaderboard. Assistant ETA engine on top.</div>
+    </div>
+
+    <div class="section-label">Pilot Server Spec · Phase 1</div>
+
+    <div class="spec-grid">
+      <div class="spec-cell"><span>OS</span>Ubuntu Server 22.04 LTS</div>
+      <div class="spec-cell"><span>CPU</span>8 vCPU (Xeon / EPYC class)</div>
+      <div class="spec-cell"><span>RAM</span>16 GB</div>
+      <div class="spec-cell"><span>Storage</span>500 GB NVMe SSD</div>
+      <div class="spec-cell"><span>Deploy</span>Docker Compose stack</div>
+      <div class="spec-cell"><span>Network</span>Campus LAN + TLS</div>
+    </div>
+
+    <div class="section-label">Frontend · Mobile App</div>
+
+    <div class="infra-card">
+      <div class="infra-tag">Production</div>
+      <div class="infra-title">React Native or Flutter</div>
+      <div class="infra-sub">Cross-platform iOS/Android. This HTML prototype demonstrates UI flows for judging — same pillar structure, navy/cyan design system.</div>
+    </div>
+
+    <div class="section-label">Data Flow</div>
+
+    <div class="flow-diagram">
+      <div class="fd-row"><div class="fd-box">Student ID tap</div><div class="fd-arrow">→</div><div class="fd-box">RFID reader</div></div>
+      <div class="fd-row"><div class="fd-box">Camera count</div><div class="fd-arrow">→</div><div class="fd-box">Edge board</div></div>
+      <div class="fd-row center"><div class="fd-arrow down">↓ MQTT</div></div>
+      <div class="fd-row"><div class="fd-box wide">Stream processor</div></div>
+      <div class="fd-row center"><div class="fd-arrow down">↓</div></div>
+      <div class="fd-row"><div class="fd-box">TimescaleDB</div><div class="fd-arrow">+</div><div class="fd-box">PostgreSQL</div></div>
+      <div class="fd-row center"><div class="fd-arrow down">↓ REST</div></div>
+      <div class="fd-row"><div class="fd-box wide accent">CampusGrid App</div></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item" data-nav="home"><span class="ni-ic">⌂</span>Home</a>
+    <a href="navigation.html" class="nav-item" data-nav="navigate"><span class="ni-ic">⌖</span>Navigate</a>
+    <a href="directory.html" class="nav-item" data-nav="directory"><span class="ni-ic">▦</span>Directory</a>
+    <a href="assistant.html" class="nav-item" data-nav="assistant"><span class="ni-ic">✦</span>Assistant</a>
+    <a href="more.html" class="nav-item" data-nav="more"><span class="ni-ic">⋯</span>More</a>
+  </div>
+</div>
+
+<script src="assets/api.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

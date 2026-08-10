@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusGrid Desktop</title>
+<style>
+  :root {
+    --bg: #0c1412;
+    --card: #15201c;
+    --line: #2a3d36;
+    --foam: #e8f2ee;
+    --dim: #8aa399;
+    --accent: #3d9b7a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(120% 80% at 50% 0%, #1a2e28 0%, var(--bg) 55%);
+    color: var(--foam);
+    display: flex; align-items: center; justify-content: center;
+    padding: 28px;
+  }
+  .wrap { width: 100%; max-width: 380px; }
+  h1 { font-size: 30px; margin: 0 0 8px; }
+  p { color: var(--dim); margin: 0 0 18px; line-height: 1.45; font-size: 14px; }
+  label { display: block; font-size: 12px; color: var(--dim); margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 12px 14px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--card); color: var(--foam);
+    font-size: 15px; margin-bottom: 12px;
+  }
+  button {
+    width: 100%; padding: 12px; border: 0; border-radius: 12px;
+    background: var(--accent); color: #04140f; font-weight: 700; font-size: 15px;
+    margin-bottom: 8px; cursor: pointer;
+  }
+  button.ghost {
+    background: transparent; color: var(--foam); border: 1px solid var(--line);
+  }
+  .err { color: #f07178; font-size: 13px; min-height: 1.2em; margin-bottom: 8px; }
+  .hint { font-size: 12px; color: var(--dim); margin-top: 10px; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>CampusGrid</h1>
+    <p>PC client for the CampusGrid server on your master laptop.</p>
+    <label for="url">Server address</label>
+    <input id="url" type="url" placeholder="http://127.0.0.1:3000">
+    <div class="err" id="err"></div>
+    <button id="go" type="button">Open CampusGrid</button>
+    <button id="local" class="ghost" type="button">Use this PC (localhost:3000)</button>
+    <p class="hint">Start the backend with <b>START.bat</b> first. Data is saved on that server’s SQLite database.</p>
+  </div>
+  <script>
+    const KEY = 'cg_server_url';
+    const input = document.getElementById('url');
+    const err = document.getElementById('err');
+    input.value = localStorage.getItem(KEY) || 'http://127.0.0.1:3000';
+
+    async function openUrl(raw) {
+      err.textContent = '';
+      let url = (raw || '').trim().replace(/\/$/, '');
+      if (!/^https?:\/\//i.test(url)) url = 'http://' + url;
+      try {
+        const u = new URL(url);
+        if (!u.port) u.port = '3000';
+        url = u.origin + '/login.html';
+      } catch {
+        err.textContent = 'Invalid address';
+        return;
+      }
+      localStorage.setItem(KEY, url.replace(/\/login\.html$/, ''));
+      if (window.CampusDesktop?.openCampus) {
+        await window.CampusDesktop.openCampus(url);
+      } else {
+        window.location.href = url;
+      }
+    }
+
+    document.getElementById('go').addEventListener('click', () => openUrl(input.value));
+    document.getElementById('local').addEventListener('click', () => openUrl('http://127.0.0.1:3000'));
+  </script>
+</body>
+</html>
