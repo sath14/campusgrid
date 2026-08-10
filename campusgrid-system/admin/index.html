@@ -7,36 +7,47 @@
   <style>
     :root {
       --bg:#0b1220; --panel:#151d2d; --text:#e8eef8; --muted:#8b9bb0;
-      --ok:#3ecf8e; --bad:#f07178; --line:#243044; --accent:#4da3ff;
+      --ok:#3ecf8e; --bad:#f07178; --line:#243044; --accent:#4da3ff; --warn:#f0c674;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-    header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    h1{margin:0;font-size:1.25rem}
-    .muted{color:var(--muted);font-size:.9rem}
-    main{padding:16px 20px;display:grid;gap:16px}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
-    .num{font-size:1.8rem;font-weight:700;margin-top:6px}
-    table{width:100%;border-collapse:collapse;font-size:.85rem}
+    header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    h1{margin:0;font-size:1.2rem}
+    h2,h3{margin:0 0 10px}
+    .muted{color:var(--muted);font-size:.88rem}
+    main{padding:16px 18px;max-width:1200px;margin:0 auto}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 16px}
+    .tabs button{background:#0f1726;border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:999px;cursor:pointer}
+    .tabs button.active{background:var(--accent);color:#041018;border-color:transparent;font-weight:700}
+    .panel{display:none}
+    .panel.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+    .num{font-size:1.7rem;font-weight:700;margin-top:6px}
+    table{width:100%;border-collapse:collapse;font-size:.84rem}
     th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
     th{color:var(--muted)}
     .flag{color:var(--bad);font-weight:700}
     .ok{color:var(--ok)}
-    input,button{font:inherit}
-    input{background:#0f1726;border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:8px}
+    input,select,button,textarea{font:inherit}
+    input,select,textarea{background:#0f1726;border:1px solid var(--line);color:var(--text);padding:8px 10px;border-radius:8px;width:100%}
     button{background:var(--accent);border:0;color:#041018;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer}
     button.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
-    #loginBox,#dash{max-width:1100px;margin:0 auto}
-    img.snap{max-width:180px;border-radius:8px;border:1px solid var(--line)}
-    @media(max-width:800px){.grid{grid-template-columns:1fr}}
+    button.danger{background:var(--bad);color:#1a0506}
+    .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;align-items:end}
+    .row label{display:block;font-size:.75rem;color:var(--muted);margin-bottom:4px}
+    img.snap{max-width:140px;border-radius:8px;border:1px solid var(--line)}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#0f1726;border:1px solid var(--line);font-size:.75rem}
+    .pill.on{border-color:var(--ok);color:var(--ok)}
+    .pill.off{border-color:var(--bad);color:var(--bad)}
+    @media(max-width:800px){main{padding:12px}}
   </style>
 </head>
 <body>
   <header>
     <div>
-      <h1>CampusGrid Server Admin</h1>
-      <div class="muted">Rapid-tap integrity · headcount check · captured photos</div>
+      <h1>CampusGrid Admin</h1>
+      <div class="muted">Arduino = main head · ESP32-S3 plug-and-play by IP · livecount = taps + headcount</div>
     </div>
     <div id="who" class="muted"></div>
   </header>
@@ -44,41 +55,184 @@
   <main>
     <section id="loginBox" class="card">
       <h2>Admin login</h2>
-      <p class="muted">Student app does not show live Arduino taps. Flags and photos appear here only.</p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-        <input id="matrix" placeholder="Matrix ID" value="ADMIN" />
-        <input id="password" type="password" placeholder="Password" value="ADMIN123" />
-        <button id="loginBtn">Sign in</button>
+      <div class="row" style="margin-top:12px">
+        <div><label>Matrix ID</label><input id="matrix" value="ADMIN" /></div>
+        <div><label>Password</label><input id="password" type="password" value="ADMIN123" /></div>
+        <div><label>&nbsp;</label><button id="loginBtn">Sign in</button></div>
       </div>
       <p id="loginErr" class="flag" style="display:none;margin-top:10px"></p>
-      <p class="muted" style="margin-top:12px">Default: <b>ADMIN</b> / <b>ADMIN123</b></p>
+      <p class="muted" style="margin-top:12px">Default: <b>ADMIN</b> / <b>ADMIN123</b> · Lecturer portal: <a href="/lecturer" style="color:var(--accent)">/lecturer</a></p>
     </section>
 
     <section id="dash" style="display:none">
-      <div class="grid">
-        <div class="card"><div class="muted">Open flags</div><div class="num" id="openFlags">0</div></div>
-        <div class="card"><div class="muted">OK checks today</div><div class="num" id="okToday">0</div></div>
-        <div class="card"><div class="muted">Taps today (admin log)</div><div class="num" id="tapsToday">0</div></div>
+      <div class="tabs" id="tabs">
+        <button data-tab="live" class="active">Live view</button>
+        <button data-tab="devices">ESP32 devices</button>
+        <button data-tab="places">Places</button>
+        <button data-tab="timetable">Class timetable</button>
+        <button data-tab="vision">Vision toggle</button>
+        <button data-tab="integrity">Integrity</button>
+        <button data-tab="photos">Tap photos</button>
+        <button data-tab="logins">Login log</button>
+        <button data-tab="data">Users / faces</button>
       </div>
 
-      <div class="card">
-        <h3>Integrity incidents</h3>
-        <p class="muted">FLAG = rapid taps (&lt;200ms) but camera saw fewer people than taps. Photo attached when available. More heads than taps = ignored (OK).</p>
-        <table>
-          <thead>
-            <tr><th>Time</th><th>UIDs</th><th>Taps</th><th>Heads</th><th>Verdict</th><th>Photo</th><th>Action</th></tr>
-          </thead>
-          <tbody id="incidents"></tbody>
-        </table>
+      <div id="tab-live" class="panel active">
+        <div class="grid">
+          <div class="card"><div class="muted">Vision mode</div><div class="num" id="lvVision">—</div></div>
+          <div class="card"><div class="muted">ESP32 online</div><div class="num" id="lvOnline">0</div></div>
+          <div class="card"><div class="muted">Active classes</div><div class="num" id="lvSessions">0</div></div>
+          <div class="card"><div class="muted">Open flags</div><div class="num" id="openFlags">0</div></div>
+        </div>
+        <div class="card">
+          <h3>Live places (taps + headcount)</h3>
+          <table><thead><tr><th>Place</th><th>Kind</th><th>Taps</th><th>Heads</th><th>Live</th><th>Cap</th></tr></thead><tbody id="lvPlaces"></tbody></table>
+        </div>
+        <div class="card">
+          <h3>Active class sessions</h3>
+          <table><thead><tr><th>Class</th><th>Type</th><th>Place</th><th>Started</th><th>Ends</th></tr></thead><tbody id="lvSessionsTbl"></tbody></table>
+        </div>
+        <div class="card">
+          <h3>Recent tap photos</h3>
+          <div id="lvPhotos" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+        </div>
+        <div class="card">
+          <h3>Recent RFID taps</h3>
+          <table><thead><tr><th>Time</th><th>UID</th><th>Doorway</th><th>Source</th></tr></thead><tbody id="lvTaps"></tbody></table>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>Recent RFID taps (admin log only)</h3>
-        <p class="muted">Not live-connected to the student frontend.</p>
-        <table>
-          <thead><tr><th>Time</th><th>UID</th><th>Interval</th><th>Doorway</th></tr></thead>
-          <tbody id="taps"></tbody>
-        </table>
+      <div id="tab-devices" class="panel">
+        <div class="card">
+          <h3>Add ESP32 (plug-and-play)</h3>
+          <p class="muted">Enter the ESP32 LAN IP. Firmware pulls doorway/place/vision config from the server. Webcam optional — system continues without headcount/facial if missing.</p>
+          <div class="row">
+            <div><label>Name</label><input id="devName" placeholder="Library door A" /></div>
+            <div><label>IP address</label><input id="devIp" placeholder="192.168.1.50" /></div>
+            <div><label>Doorway</label><input id="devDoor" placeholder="LIB-A" /></div>
+            <div><label>Place slug</label><input id="devPlace" placeholder="library" /></div>
+            <div><label>Vision</label>
+              <select id="devVision"><option value="headcount">Headcount</option><option value="facial">Facial records</option></select>
+            </div>
+            <div><label>&nbsp;</label><button id="addDevice">Add device</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Registered devices</h3>
+          <table>
+            <thead><tr><th>Name</th><th>IP</th><th>Place</th><th>Vision</th><th>Webcam</th><th>Status</th><th></th></tr></thead>
+            <tbody id="devicesTbl"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="tab-places" class="panel">
+        <div class="card">
+          <h3>Add place</h3>
+          <p class="muted">Cafeteria / library / counselling use livecount (taps + headcount). Lecture / tutorial / lab switch to class timetable sessions.</p>
+          <div class="row">
+            <div><label>Name</label><input id="placeName" placeholder="Student Lounge" /></div>
+            <div><label>Slug</label><input id="placeSlug" placeholder="student-lounge" /></div>
+            <div><label>Kind</label>
+              <select id="placeKind">
+                <option value="cafeteria">cafeteria</option>
+                <option value="library">library</option>
+                <option value="counselling">counselling</option>
+                <option value="common">common (livecount)</option>
+                <option value="lecture">lecture</option>
+                <option value="tutorial">tutorial</option>
+                <option value="lab">lab</option>
+              </select>
+            </div>
+            <div><label>Capacity</label><input id="placeCap" type="number" value="50" /></div>
+            <div><label>&nbsp;</label><button id="addPlace">Add place</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <table><thead><tr><th>Name</th><th>Slug</th><th>Kind</th><th>Live</th><th>Capacity</th></tr></thead><tbody id="placesTbl"></tbody></table>
+        </div>
+      </div>
+
+      <div id="tab-timetable" class="panel">
+        <div class="card">
+          <h3>Add class to timetable</h3>
+          <p class="muted">First RFID tap after start time opens the class session. Timer: lecture/tutorial = 1 hour, lab = 2 hours.</p>
+          <div class="row">
+            <div><label>Code</label><input id="ttCode" placeholder="MECH201" /></div>
+            <div><label>Name</label><input id="ttName" placeholder="Thermodynamics II" /></div>
+            <div><label>Type</label>
+              <select id="ttType"><option>lecture</option><option>tutorial</option><option>lab</option></select>
+            </div>
+            <div><label>Place slug</label><input id="ttPlace" placeholder="dk12" /></div>
+            <div><label>Day (0=Sun)</label><input id="ttDay" type="number" min="0" max="6" value="4" /></div>
+            <div><label>Start (HH:MM)</label><input id="ttStart" value="15:00" /></div>
+            <div><label>Lecturer user id</label><input id="ttLect" placeholder="optional" /></div>
+            <div><label>&nbsp;</label><button id="addTt">Add class</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <table><thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Place</th><th>Day</th><th>Start</th><th>Mins</th><th>Lecturer</th><th></th></tr></thead><tbody id="ttTbl"></tbody></table>
+        </div>
+      </div>
+
+      <div id="tab-vision" class="panel">
+        <div class="card">
+          <h3>Global vision mode</h3>
+          <p class="muted">Headcount feeds livecount for cafeteria/library/counselling. Facial mode archives face photos for recognition records — it is <b>not</b> used for place livecount on ESP32.</p>
+          <div class="row">
+            <div><label>Mode</label>
+              <select id="visionMode"><option value="headcount">Headcount</option><option value="facial">Facial recognition records</option></select>
+            </div>
+            <div><label>&nbsp;</label><button id="saveVision">Save</button></div>
+          </div>
+          <p id="visionMsg" class="ok" style="display:none;margin-top:10px"></p>
+        </div>
+      </div>
+
+      <div id="tab-integrity" class="panel">
+        <div class="grid">
+          <div class="card"><div class="muted">Open flags</div><div class="num" id="openFlags2">0</div></div>
+          <div class="card"><div class="muted">OK checks today</div><div class="num" id="okToday">0</div></div>
+          <div class="card"><div class="muted">Taps today</div><div class="num" id="tapsToday">0</div></div>
+        </div>
+        <div class="card">
+          <h3>Integrity incidents (Arduino main head)</h3>
+          <table><thead><tr><th>Time</th><th>UIDs</th><th>Taps</th><th>Heads</th><th>Verdict</th><th>Photo</th><th></th></tr></thead><tbody id="incidents"></tbody></table>
+        </div>
+      </div>
+
+      <div id="tab-photos" class="panel">
+        <div class="card">
+          <h3>Card-tap photos (stored in data/tap_photos)</h3>
+          <table><thead><tr><th>Time</th><th>UID</th><th>Student</th><th>Place</th><th>Photo</th></tr></thead><tbody id="photosTbl"></tbody></table>
+        </div>
+      </div>
+
+      <div id="tab-logins" class="panel">
+        <div class="card">
+          <h3>Login log</h3>
+          <table><thead><tr><th>Time</th><th>Matrix</th><th>Role</th><th>IP</th><th>OK</th></tr></thead><tbody id="loginsTbl"></tbody></table>
+        </div>
+      </div>
+
+      <div id="tab-data" class="panel">
+        <div class="card">
+          <h3>Add lecturer</h3>
+          <div class="row">
+            <div><label>Name</label><input id="lectName" placeholder="DR NAME" /></div>
+            <div><label>Matrix ID</label><input id="lectMatrix" placeholder="LECT02" /></div>
+            <div><label>Password</label><input id="lectPass" placeholder="optional" /></div>
+            <div><label>&nbsp;</label><button id="addLect">Create lecturer</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Users</h3>
+          <table><thead><tr><th>Name</th><th>Matrix</th><th>Role</th><th>RFID</th><th>Face</th></tr></thead><tbody id="usersTbl"></tbody></table>
+        </div>
+        <div class="card">
+          <h3>Facial recognition records</h3>
+          <table><thead><tr><th>Time</th><th>Student</th><th>Source</th><th>Photo</th></tr></thead><tbody id="facesTbl"></tbody></table>
+        </div>
       </div>
 
       <button class="ghost" id="logoutBtn">Log out</button>
@@ -92,18 +246,26 @@
   function authHeaders() {
     return { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
   }
-
   async function api(path, opts={}) {
     const res = await fetch(API + path, { ...opts, headers: { ...authHeaders(), ...(opts.headers||{}) } });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Request failed');
     return data;
   }
-
   function showDash(on) {
     document.getElementById('loginBox').style.display = on ? 'none' : 'block';
     document.getElementById('dash').style.display = on ? 'block' : 'none';
   }
+  function esc(s){ return String(s??'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+  document.querySelectorAll('#tabs button').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('#tabs button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    };
+  });
 
   document.getElementById('loginBtn').onclick = async () => {
     const err = document.getElementById('loginErr');
@@ -137,67 +299,200 @@
     showDash(false);
   };
 
-  async function review(id, status) {
-    await api('/admin/incidents/' + id + '/review', {
+  document.getElementById('addDevice').onclick = async () => {
+    await api('/admin/devices', {
       method: 'POST',
-      body: JSON.stringify({ status })
+      body: JSON.stringify({
+        name: document.getElementById('devName').value,
+        ip_address: document.getElementById('devIp').value,
+        doorway: document.getElementById('devDoor').value,
+        place_slug: document.getElementById('devPlace').value,
+        vision_mode: document.getElementById('devVision').value
+      })
     });
+    refresh();
+  };
+
+  document.getElementById('addPlace').onclick = async () => {
+    await api('/admin/places', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: document.getElementById('placeName').value,
+        slug: document.getElementById('placeSlug').value,
+        kind: document.getElementById('placeKind').value,
+        capacity: Number(document.getElementById('placeCap').value)
+      })
+    });
+    refresh();
+  };
+
+  document.getElementById('addTt').onclick = async () => {
+    await api('/admin/timetable', {
+      method: 'POST',
+      body: JSON.stringify({
+        class_code: document.getElementById('ttCode').value,
+        class_name: document.getElementById('ttName').value,
+        class_type: document.getElementById('ttType').value,
+        place_slug: document.getElementById('ttPlace').value,
+        day_of_week: Number(document.getElementById('ttDay').value),
+        start_time: document.getElementById('ttStart').value,
+        lecturer_id: document.getElementById('ttLect').value || null
+      })
+    });
+    refresh();
+  };
+
+  document.getElementById('saveVision').onclick = async () => {
+    await api('/admin/settings', {
+      method: 'PATCH',
+      body: JSON.stringify({ vision_mode: document.getElementById('visionMode').value })
+    });
+    const m = document.getElementById('visionMsg');
+    m.textContent = 'Saved';
+    m.style.display = 'block';
+    refresh();
+  };
+
+  document.getElementById('addLect').onclick = async () => {
+    await api('/admin/lecturers', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: document.getElementById('lectName').value,
+        matrix_id: document.getElementById('lectMatrix').value,
+        password: document.getElementById('lectPass').value || undefined
+      })
+    });
+    refresh();
+  };
+
+  async function review(id, status) {
+    await api('/admin/incidents/' + id + '/review', { method: 'POST', body: JSON.stringify({ status }) });
+    refresh();
+  }
+
+  async function delDevice(id) {
+    await api('/admin/devices/' + id, { method: 'DELETE' });
+    refresh();
+  }
+  async function delTt(id) {
+    await api('/admin/timetable/' + id, { method: 'DELETE' });
     refresh();
   }
 
   async function refresh() {
     if (!token) return;
     try {
-      const summary = await api('/admin/summary');
+      const [summary, live, devices, places, tt, photos, logins, users, faces, settings, incidents, taps] = await Promise.all([
+        api('/admin/summary'),
+        api('/admin/live-view'),
+        api('/admin/devices'),
+        api('/admin/places'),
+        api('/admin/timetable'),
+        api('/admin/tap-photos'),
+        api('/admin/login-logs'),
+        api('/admin/users'),
+        api('/admin/face-records'),
+        api('/admin/settings'),
+        api('/admin/incidents'),
+        api('/admin/taps')
+      ]);
+
       document.getElementById('openFlags').textContent = summary.open_flags;
+      document.getElementById('openFlags2').textContent = summary.open_flags;
       document.getElementById('okToday').textContent = summary.ok_checks_today;
       document.getElementById('tapsToday').textContent = summary.taps_today;
 
-      const incidents = await api('/admin/incidents');
-      document.getElementById('incidents').innerHTML = incidents.map(i => `
-        <tr>
-          <td>${i.created_at || ''}</td>
-          <td>${i.uids || ''}</td>
-          <td>${i.tap_count}</td>
-          <td>${i.headcount}</td>
-          <td class="${i.verdict === 'flagged' ? 'flag' : 'ok'}">${i.verdict} · ${i.status}</td>
-          <td>${i.photo_file ? `<img class="snap" src="/incidents/${i.photo_file}" alt="snapshot" />` : '—'}</td>
-          <td>
-            ${i.status === 'open' ? `
-              <button onclick="review(${i.id},'reviewed')">Review</button>
-              <button class="ghost" onclick="review(${i.id},'dismissed')">Dismiss</button>
-            ` : (i.admin_note || '')}
-          </td>
-        </tr>
-        <tr><td colspan="7" class="muted">${i.reason || ''}</td></tr>
-      `).join('');
+      document.getElementById('lvVision').textContent = live.vision_mode || settings.vision_mode || '—';
+      document.getElementById('visionMode').value = settings.vision_mode || 'headcount';
+      document.getElementById('lvOnline').textContent = devices.filter(d => d.online).length;
+      document.getElementById('lvSessions').textContent = (live.active_sessions || []).length;
 
-      const taps = await api('/admin/taps');
-      document.getElementById('taps').innerHTML = taps.slice(0, 40).map(t => `
-        <tr>
-          <td>${t.tapped_at || ''}</td>
-          <td>${t.rfid_tag}</td>
-          <td>${t.interval_ms == null ? '—' : t.interval_ms + ' ms'}</td>
-          <td>${t.doorway || ''}</td>
-        </tr>
-      `).join('');
+      document.getElementById('lvPlaces').innerHTML = (live.places || []).map(p =>
+        `<tr><td>${esc(p.name)}</td><td>${esc(p.kind)}</td><td>${p.current_taps}</td><td>${p.current_headcount}</td><td><b>${p.live_count}</b></td><td>${p.capacity}</td></tr>`
+      ).join('');
+
+      document.getElementById('lvSessionsTbl').innerHTML = (live.active_sessions || []).map(s =>
+        `<tr><td>${esc(s.class_name)}</td><td>${esc(s.class_type)}</td><td>${esc(s.place_slug)}</td><td>${esc(s.started_at)}</td><td>${esc(s.ends_at)}</td></tr>`
+      ).join('') || '<tr><td colspan="5" class="muted">No active sessions</td></tr>';
+
+      document.getElementById('lvPhotos').innerHTML = (live.recent_photos || []).map(p =>
+        `<div><img class="snap" src="/tap-photos/${esc(p.photo_file)}" alt=""><div class="muted">${esc(p.rfid_tag)}</div></div>`
+      ).join('') || '<span class="muted">No photos yet</span>';
+
+      document.getElementById('lvTaps').innerHTML = (live.recent_taps || []).map(t =>
+        `<tr><td>${esc(t.tapped_at)}</td><td>${esc(t.rfid_tag)}</td><td>${esc(t.doorway)}</td><td>${esc(t.source)}</td></tr>`
+      ).join('');
+
+      document.getElementById('devicesTbl').innerHTML = devices.map(d =>
+        `<tr>
+          <td>${esc(d.name)}</td><td>${esc(d.ip_address)}</td><td>${esc(d.place_slug||'')}</td>
+          <td>${esc(d.vision_mode)}</td>
+          <td>${d.webcam_enabled ? 'yes' : 'optional'}</td>
+          <td><span class="pill ${d.online ? 'on' : 'off'}">${d.online ? 'online' : 'offline'}</span></td>
+          <td><button class="danger" onclick="delDevice(${d.id})">Remove</button></td>
+        </tr>`
+      ).join('') || '<tr><td colspan="7" class="muted">No ESP32 devices yet — add an IP above</td></tr>';
+
+      document.getElementById('placesTbl').innerHTML = places.map(p =>
+        `<tr><td>${esc(p.name)}</td><td>${esc(p.slug)}</td><td>${esc(p.kind)}</td><td>${p.live_count}</td><td>${p.capacity}</td></tr>`
+      ).join('');
+
+      document.getElementById('ttTbl').innerHTML = tt.map(t =>
+        `<tr>
+          <td>${esc(t.class_code)}</td><td>${esc(t.class_name)}</td><td>${esc(t.class_type)}</td>
+          <td>${esc(t.place_slug)}</td><td>${t.day_of_week}</td><td>${esc(t.start_time)}</td>
+          <td>${t.duration_minutes}</td><td>${esc(t.lecturer_name||t.lecturer_id||'')}</td>
+          <td><button class="ghost" onclick="delTt(${t.id})">Delete</button></td>
+        </tr>`
+      ).join('');
+
+      document.getElementById('photosTbl').innerHTML = photos.map(p =>
+        `<tr><td>${esc(p.captured_at)}</td><td>${esc(p.rfid_tag)}</td><td>${esc(p.student_name||'—')}</td><td>${esc(p.place_slug||'')}</td>
+         <td>${p.photo_file ? `<img class="snap" src="/tap-photos/${esc(p.photo_file)}">` : '—'}</td></tr>`
+      ).join('');
+
+      document.getElementById('loginsTbl').innerHTML = logins.map(l =>
+        `<tr><td>${esc(l.created_at)}</td><td>${esc(l.matrix_id)}</td><td>${esc(l.role)}</td><td>${esc(l.ip||'')}</td><td>${l.success ? '✓' : '✗'}</td></tr>`
+      ).join('');
+
+      document.getElementById('usersTbl').innerHTML = users.map(u =>
+        `<tr><td>${esc(u.name)}</td><td>${esc(u.matrix_id)}</td><td>${esc(u.role)}</td><td>${esc(u.rfid_tag||'')}</td>
+         <td>${u.face_file ? `<img class="snap" src="/faces/${esc(u.face_file)}">` : '—'}</td></tr>`
+      ).join('');
+
+      document.getElementById('facesTbl').innerHTML = faces.map(f =>
+        `<tr><td>${esc(f.captured_at)}</td><td>${esc(f.name)} (${esc(f.matrix_id)})</td><td>${esc(f.source)}</td>
+         <td><img class="snap" src="/tap-photos/${esc(f.photo_file)}" onerror="this.src='/faces/${esc(f.photo_file)}'"></td></tr>`
+      ).join('');
+
+      document.getElementById('incidents').innerHTML = incidents.map(i =>
+        `<tr>
+          <td>${esc(i.created_at)}</td><td>${esc(i.uids)}</td><td>${i.tap_count}</td><td>${i.headcount}</td>
+          <td class="${i.verdict==='flagged'?'flag':'ok'}">${esc(i.verdict)}</td>
+          <td>${i.photo_file ? `<img class="snap" src="/incidents/${esc(i.photo_file)}">` : '—'}</td>
+          <td>${i.status==='open' ? `<button class="ghost" onclick="review(${i.id},'reviewed')">Review</button>` : esc(i.status)}</td>
+        </tr>`
+      ).join('');
     } catch (e) {
-      if (String(e.message).includes('Admin') || String(e.message).includes('Authentication')) {
+      if (String(e.message).toLowerCase().includes('auth') || String(e.message).includes('401')) {
         showDash(false);
       }
+      console.error(e);
     }
   }
 
+  window.delDevice = delDevice;
+  window.delTt = delTt;
+  window.review = review;
+
   if (token) {
-    // validate token by loading summary
-    api('/admin/summary').then(() => {
-      showDash(true);
-      document.getElementById('who').textContent = 'Admin session';
+    showDash(true);
+    api('/auth/me').then(d => {
+      document.getElementById('who').textContent = d.user.name + ' · ' + d.user.matrix_id;
       refresh();
     }).catch(() => showDash(false));
   }
-
-  setInterval(() => { if (token) refresh(); }, 4000);
+  setInterval(() => { if (token) refresh(); }, 8000);
 </script>
 </body>
 </html>

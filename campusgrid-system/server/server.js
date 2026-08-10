@@ -4,7 +4,12 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const { db, initDb, seedDb } = require('./db');
+const { db, initDb, seedDb, ensureHubDefaults } = require('./db');
+const {
+  registerHubRoutes,
+  processEdgeTap,
+  getSetting
+} = require('./hub');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'campusgrid-dev-secret-change-in-production';
 const EDGE_KEY = process.env.EDGE_KEY || 'campusgrid-edge-secret';
@@ -16,6 +21,7 @@ const FACES_DIR = path.join(DATA_DIR, 'faces');
 
 initDb();
 seedDb();
+ensureHubDefaults();
 
 const app = express();
 app.use(cors());
@@ -541,7 +547,19 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   logActivity(user.id, 'login', user.matrix_id || user.email);
-  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+  try {
+    db.prepare(
+      `INSERT INTO login_logs (user_id, matrix_id, role, ip, user_agent, success)
+       VALUES (?, ?, ?, ?, ?, 1)`
+    ).run(
+      user.id,
+      user.matrix_id || user.email,
+      user.role || 'student',
+      req.ip || req.socket?.remoteAddress || null,
+      String(req.headers['user-agent'] || '').slice(0, 240)
+    );
+  } catch (_) { /* ignore */ }
+  const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
   res.json({ token, user: getUser(user.id) });
 });
 
@@ -913,38 +931,17 @@ app.get('/api/meta/sync', (req, res) => {
 });
 
 // ---- Edge gateway ingest (Arduino USB agent / ESP32 WiFi) ----
-// Student app is NOT live-fed from these taps. Admin console reads them.
+// Arduino Mega = main head. ESP32-S3 nodes register via Admin → Devices (IP).
+// Webcam optional: if missing, taps still record without headcount/facial photo.
 app.post('/api/edge/tap', edgeAuth, (req, res) => {
-  const uid = String(req.body.uid || req.body.rfid_tag || '').toUpperCase();
-  if (!uid) return res.status(400).json({ error: 'uid required' });
-
-  const doorway = req.body.doorway || 'unknown';
-  const facility = req.body.facility_slug || null;
-  const source = req.body.source || 'edge';
-  const intervalMs = req.body.interval_ms == null ? null : Number(req.body.interval_ms);
-  // Do not auto-flag here — integrity endpoint decides after headcount
-  const flagged = 0;
-  const tappedAt = req.body.ts || new Date().toISOString();
-
-  db.prepare(
-    `INSERT INTO edge_taps (rfid_tag, doorway, facility_slug, source, interval_ms, flagged, tapped_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ).run(uid, doorway, facility, source, intervalMs, flagged, tappedAt);
-
-  db.prepare('INSERT INTO rfid_taps (rfid_tag, doorway, user_id) VALUES (?, ?, NULL)')
-    .run(uid, doorway);
-
-  // Quiet attendance bump only for registered cards (not shown as live Arduino feed in student UI)
-  const user = db.prepare('SELECT id FROM users WHERE upper(rfid_tag) = ?').get(uid);
-  if (user && facility) {
-    db.prepare(
-      `INSERT INTO attendance_records (user_id, facility_slug, class_name, status, tapped_at)
-       VALUES (?, ?, ?, 'present', ?)`
-    ).run(user.id, facility, null, tappedAt);
-  }
-
-  db.prepare(`UPDATE grid_stats SET last_sync = datetime('now') WHERE id = 1`).run();
-  res.status(201).json({ ok: true, admin_only: true });
+  const result = processEdgeTap(db, DATA_DIR, {
+    ...req.body,
+    // Legacy agent fields
+    facility_slug: req.body.facility_slug || req.body.place_slug,
+    place_slug: req.body.place_slug || req.body.facility_slug
+  });
+  if (result.error) return res.status(result.status || 400).json(result);
+  res.status(201).json({ ...result, admin_only: true });
 });
 
 /**
@@ -1098,7 +1095,6 @@ app.get('/api/edge/taps', adminRequired, (_req, res) => {
   res.json(db.prepare('SELECT * FROM edge_taps ORDER BY tapped_at DESC LIMIT 100').all());
 });
 
-/** Admin live status (not used by student app) */
 app.get('/api/admin/live-status', adminRequired, (_req, res) => {
   const lastHc = db.prepare('SELECT * FROM doorway_headcounts ORDER BY captured_at DESC LIMIT 1').get();
   const recentTaps = db.prepare('SELECT * FROM edge_taps ORDER BY id DESC LIMIT 20').all();
@@ -1108,15 +1104,32 @@ app.get('/api/admin/live-status', adminRequired, (_req, res) => {
   res.json({
     last_headcount: lastHc,
     recent_taps: recentTaps,
-    open_incidents: openIncidents
+    open_incidents: openIncidents,
+    vision_mode: getSetting(db, 'vision_mode', 'headcount')
   });
+});
+
+// Hub: ESP32 devices, places, timetable, lecturer, login logs, live view
+registerHubRoutes(app, {
+  db,
+  DATA_DIR,
+  authRequired,
+  adminRequired,
+  edgeAuth,
+  getUser,
+  logActivity,
+  bcrypt,
+  jwt,
+  JWT_SECRET
 });
 
 // ---- Static: admin console + CampusGrid student app ----
 const EDGE_DASH = path.join(__dirname, '..', 'edge', 'dashboard');
 const ADMIN_DIR = path.join(__dirname, '..', 'admin');
+const LECTURER_DIR = path.join(__dirname, '..', 'lecturer');
 const INCIDENTS_DIR = path.join(DATA_DIR, 'incidents');
 require('fs').mkdirSync(INCIDENTS_DIR, { recursive: true });
+require('fs').mkdirSync(LECTURER_DIR, { recursive: true });
 
 if (!require('fs').existsSync(APP_DIR)) {
   console.error('Missing frontend folder:', APP_DIR);
@@ -1127,6 +1140,10 @@ app.use('/incidents', express.static(INCIDENTS_DIR));
 app.use('/admin', express.static(ADMIN_DIR));
 app.get('/admin', (_req, res) => {
   res.sendFile(path.join(ADMIN_DIR, 'index.html'));
+});
+app.use('/lecturer', express.static(LECTURER_DIR));
+app.get('/lecturer', (_req, res) => {
+  res.sendFile(path.join(LECTURER_DIR, 'index.html'));
 });
 // Legacy path redirects to admin (edge dash retired as public)
 app.get('/edge', (_req, res) => {
@@ -1160,15 +1177,18 @@ if (require.main === module) {
     console.log('========================================');
     console.log(`  App (students): http://127.0.0.1:${PORT}`);
     console.log(`  Admin console:  http://127.0.0.1:${PORT}/admin`);
+    console.log(`  Lecturer:       http://127.0.0.1:${PORT}/lecturer`);
     for (const ip of lanIPs()) {
       console.log(`  App (phone):    http://${ip}:${PORT}`);
       console.log(`  Admin (LAN):    http://${ip}:${PORT}/admin`);
+      console.log(`  Lecturer (LAN): http://${ip}:${PORT}/lecturer`);
     }
     console.log('========================================');
-    console.log('  Student login: Matrix ID / Matrix ID');
-    console.log('  Admin login:   ADMIN / ADMIN123');
-    console.log('  Demo student:  A22DEMO001 / A22DEMO001');
-    console.log('  Next: START-AGENT.bat (Arduino + webcam)');
+    console.log('  Student:  Matrix ID / Matrix ID');
+    console.log('  Admin:    ADMIN / ADMIN123');
+    console.log('  Lecturer: LECT01 / LECT123');
+    console.log('  Demo:     A22DEMO001 / A22DEMO001');
+    console.log('  Arduino = main head · ESP32 add via Admin → Devices');
     console.log('========================================');
     console.log('');
   });

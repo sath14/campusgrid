@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CampusGrid Lecturer</title>
+  <style>
+    :root{--bg:#0f1410;--panel:#1a221c;--text:#eaf2ec;--muted:#8fa396;--line:#2a3830;--accent:#3d9b7a}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    header,main{max-width:1000px;margin:0 auto;padding:16px}
+    header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+    .muted{color:var(--muted);font-size:.9rem}
+    input,button{font:inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line)}
+    input{background:#121a15;color:var(--text);width:100%}
+    button{background:var(--accent);border:0;color:#04140f;font-weight:700;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+    table{width:100%;border-collapse:collapse;font-size:.88rem}
+    th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--muted)}
+    img.face{width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+    .row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px}
+    @media(max-width:700px){.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1 style="margin:0;font-size:1.25rem">Lecturer attendance</h1>
+      <div class="muted">Class sessions with student RFID photos</div>
+    </div>
+    <div id="who" class="muted"></div>
+  </header>
+  <main>
+    <section id="login" class="card">
+      <h2>Lecturer login</h2>
+      <div class="row" style="margin-top:10px">
+        <input id="matrix" placeholder="Matrix ID" value="LECT01" />
+        <input id="password" type="password" placeholder="Password" value="LECT123" />
+        <button id="loginBtn">Sign in</button>
+      </div>
+      <p id="err" class="muted" style="color:#f07178;display:none"></p>
+      <p class="muted">Demo: <b>LECT01</b> / <b>LECT123</b></p>
+    </section>
+
+    <section id="dash" style="display:none">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">
+          <h3 style="margin:0">Your class sessions</h3>
+          <button class="ghost" id="logout">Log out</button>
+        </div>
+        <table style="margin-top:12px">
+          <thead><tr><th>Class</th><th>Type</th><th>Place</th><th>Started</th><th>Ends</th><th>Status</th><th></th></tr></thead>
+          <tbody id="sessions"></tbody>
+        </table>
+      </div>
+      <div class="card" id="attBox" style="display:none">
+        <h3 id="attTitle">Attendance</h3>
+        <p class="muted" id="attMeta"></p>
+        <table>
+          <thead><tr><th>Time</th><th>Student</th><th>Matrix</th><th>RFID</th><th>Tap photo</th><th>Profile face</th></tr></thead>
+          <tbody id="attRows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+<script>
+  const API = location.origin + '/api';
+  let token = localStorage.getItem('cg_lect_token') || '';
+  function headers(){ return { Authorization:'Bearer '+token, 'Content-Type':'application/json' }; }
+  async function api(path){
+    const res = await fetch(API+path,{headers:headers()});
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(data.error||'Failed');
+    return data;
+  }
+  function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function show(on){
+    document.getElementById('login').style.display = on?'none':'block';
+    document.getElementById('dash').style.display = on?'block':'none';
+  }
+  document.getElementById('loginBtn').onclick = async ()=>{
+    const err=document.getElementById('err'); err.style.display='none';
+    try{
+      const res=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({matrix_id:document.getElementById('matrix').value.trim(),password:document.getElementById('password').value})});
+      const data=await res.json();
+      if(!res.ok) throw new Error(data.error||'Login failed');
+      if(data.user.role!=='lecturer' && data.user.role!=='admin') throw new Error('Not a lecturer account');
+      token=data.token; localStorage.setItem('cg_lect_token',token);
+      document.getElementById('who').textContent=data.user.name+' · '+data.user.matrix_id;
+      show(true); loadSessions();
+    }catch(e){ err.textContent=e.message; err.style.display='block'; }
+  };
+  document.getElementById('logout').onclick=()=>{ token=''; localStorage.removeItem('cg_lect_token'); show(false); };
+  async function loadSessions(){
+    const rows=await api('/lecturer/sessions');
+    document.getElementById('sessions').innerHTML = rows.map(s=>`
+      <tr>
+        <td>${esc(s.class_name)} <span class="muted">(${esc(s.class_code)})</span></td>
+        <td>${esc(s.class_type)}</td><td>${esc(s.place_slug)}</td>
+        <td>${esc(s.started_at)}</td><td>${esc(s.ends_at)}</td><td>${esc(s.status)}</td>
+        <td><button class="ghost" onclick="openAtt(${s.id})">Attendance</button></td>
+      </tr>`).join('') || '<tr><td colspan="7" class="muted">No sessions yet — first RFID tap after class start time opens a session</td></tr>';
+  }
+  window.openAtt = async (id)=>{
+    const data=await api('/lecturer/sessions/'+id+'/attendance');
+    document.getElementById('attBox').style.display='block';
+    document.getElementById('attTitle').textContent = data.session.class_name + ' attendance';
+    document.getElementById('attMeta').textContent =
+      `${data.session.class_type} · ${data.session.place_slug} · ${data.attendance.length} students`;
+    document.getElementById('attRows').innerHTML = data.attendance.map(a=>`
+      <tr>
+        <td>${esc(a.tapped_at)}</td>
+        <td>${esc(a.name||'Unknown')}</td>
+        <td>${esc(a.matrix_id||'')}</td>
+        <td>${esc(a.rfid_tag)}</td>
+        <td>${a.photo_file?`<img class="face" src="/tap-photos/${esc(a.photo_file)}">`:'—'}</td>
+        <td>${a.profile_face?`<img class="face" src="/faces/${esc(a.profile_face)}">`:'—'}</td>
+      </tr>`).join('') || '<tr><td colspan="6" class="muted">No taps yet</td></tr>';
+  };
+  if(token){
+    show(true);
+    api('/lecturer/me').then(d=>{ document.getElementById('who').textContent=d.user.name+' · '+d.user.matrix_id; loadSessions(); })
+      .catch(()=>show(false));
+  }
+</script>
+</body>
+</html>
