@@ -82,12 +82,20 @@ android:usesCleartextTraffic="true"
 android:networkSecurityConfig="@xml/network_security_config"
 ```
 
-Also add internet permission if not already present (near top, before `<application>`):
+Also add internet permission if not already present (**before** `<application>`):
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
+
+### JDK note (Android Studio)
+
+This Android project uses **Gradle 9.1** + **AGP 8.12**, so **Gradle JDK 25** is supported.
+
+**Settings → Build Tools → Gradle → Gradle JDK** can be **25**, **jbr-17**, or **21**.
+
+If sync fails on an older Android Studio, update Android Studio, or temporarily pick **jbr-17**.
 
 ### Step 3 — Open in Android Studio and build APK
 
