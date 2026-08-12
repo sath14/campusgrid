@@ -1,21 +1,32 @@
-# CampusGrid Android client
+# CampusGrid Android (APK)
 
-Connects to the master laptop server (`http://LAN_IP:3000`).
+Capacitor shell that opens the CampusGrid web app on a phone.
 
-## JDK 25
+## Build on JDK 25
 
-This project is set up for **Gradle JDK 25**:
+Requires:
 
-| Piece | Version |
-|-------|---------|
+- **JDK 25**
+- **Android SDK** (platform 36 + build-tools 36)
+- **Node.js 20+**
+
+```bash
+export JAVA_HOME=/path/to/jdk-25
+export ANDROID_HOME=/path/to/Android/Sdk
+./BUILD-APK.sh
+```
+
+Output:
+
+`android/app/build/outputs/apk/debug/app-debug.apk`
+
+Toolchain pinned in the `android/` project:
+
+| Tool | Version |
+|------|---------|
 | Gradle | 9.1.0 |
-| Android Gradle Plugin | 8.12.0 |
-| compileSdk | 35 |
+| Android Gradle Plugin | 9.0.0 |
+| compileSdk / targetSdk | 36 |
+| Capacitor | 8.5 |
 
-In Android Studio: **Settings → Build Tools → Gradle → Gradle JDK → 25**
-
-Then **File → Sync Project with Gradle Files**.
-
-## Build
-
-See `../../PACKAGING.md` for cleartext HTTP + APK steps.
+Cleartext HTTP to the master laptop is enabled in `AndroidManifest.xml` + `network_security_config.xml`.

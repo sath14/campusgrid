@@ -240,6 +240,111 @@ function initDb() {
       reviewed_at TEXT,
       admin_note TEXT
     );
+
+    -- Plug-and-play ESP32 / edge devices (Arduino remains the main head)
+    CREATE TABLE IF NOT EXISTS edge_devices (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      ip_address TEXT NOT NULL,
+      device_type TEXT DEFAULT 'esp32-s3',
+      doorway TEXT,
+      place_slug TEXT,
+      vision_mode TEXT DEFAULT 'headcount',
+      webcam_enabled INTEGER DEFAULT 1,
+      online INTEGER DEFAULT 0,
+      last_seen TEXT,
+      notes TEXT,
+      created_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(ip_address)
+    );
+
+    -- Places with livecount (taps + headcount). Facial recognition is NOT used for count.
+    CREATE TABLE IF NOT EXISTS places (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      kind TEXT NOT NULL,
+      capacity INTEGER DEFAULT 0,
+      livecount_enabled INTEGER DEFAULT 1,
+      current_taps INTEGER DEFAULT 0,
+      current_headcount INTEGER DEFAULT 0,
+      live_count INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- Admin-managed class timetable (lecture / tutorial / lab)
+    CREATE TABLE IF NOT EXISTS class_timetable (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      class_code TEXT NOT NULL,
+      class_name TEXT NOT NULL,
+      class_type TEXT NOT NULL,
+      place_slug TEXT NOT NULL,
+      lecturer_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      day_of_week INTEGER NOT NULL,
+      start_time TEXT NOT NULL,
+      duration_minutes INTEGER NOT NULL,
+      active INTEGER DEFAULT 1
+    );
+
+    CREATE TABLE IF NOT EXISTS class_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      timetable_id INTEGER REFERENCES class_timetable(id) ON DELETE SET NULL,
+      class_code TEXT NOT NULL,
+      class_name TEXT NOT NULL,
+      class_type TEXT NOT NULL,
+      place_slug TEXT NOT NULL,
+      lecturer_id INTEGER,
+      started_at TEXT NOT NULL,
+      ends_at TEXT NOT NULL,
+      status TEXT DEFAULT 'active',
+      started_by_rfid TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS session_attendance (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      session_id INTEGER NOT NULL REFERENCES class_sessions(id) ON DELETE CASCADE,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      rfid_tag TEXT NOT NULL,
+      photo_file TEXT,
+      tapped_at TEXT NOT NULL,
+      UNIQUE(session_id, rfid_tag)
+    );
+
+    -- Photo captured when a card is read
+    CREATE TABLE IF NOT EXISTS tap_photos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      rfid_tag TEXT NOT NULL,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      device_id INTEGER REFERENCES edge_devices(id) ON DELETE SET NULL,
+      doorway TEXT,
+      place_slug TEXT,
+      photo_file TEXT NOT NULL,
+      captured_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS login_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      matrix_id TEXT,
+      role TEXT,
+      ip TEXT,
+      user_agent TEXT,
+      success INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS face_records (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      photo_file TEXT NOT NULL,
+      source TEXT DEFAULT 'enrollment',
+      captured_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS system_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
   `);
 
   // Safe migrations for older DBs
@@ -268,6 +373,15 @@ function initDb() {
   if (flagCols.length && !flagCols.includes('verdict')) {
     try { db.exec(`ALTER TABLE rapid_tap_flags ADD COLUMN verdict TEXT DEFAULT 'flagged'`); } catch (_) {}
   }
+
+  // Default vision / system settings
+  const set = (k, v) => {
+    const row = db.prepare('SELECT key FROM system_settings WHERE key = ?').get(k);
+    if (!row) db.prepare('INSERT INTO system_settings (key, value) VALUES (?, ?)').run(k, v);
+  };
+  set('vision_mode', 'headcount'); // headcount | facial
+  set('facial_enrollment', '1');
+  set('arduino_is_main_head', '1');
 }
 
 function seedDb() {
@@ -429,6 +543,83 @@ function seedDb() {
 
   db.prepare(`INSERT INTO activity_logs (user_id, action, details) VALUES (?, ?, ?)`)
     .run(sathId, 'login', 'Initial seed login');
+
+  // Livecount places (taps + headcount only — no facial recognition for count)
+  const places = [
+    ['cafeteria', 'Cafeteria', 'cafeteria', 200, 1],
+    ['library', 'Main Library', 'library', 400, 1],
+    ['counselling', 'Counselling Room', 'counselling', 8, 1],
+    ['dk12', 'DK12 Lecture Hall', 'lecture', 180, 0],
+    ['tutorial-t3', 'Tutorial Room T3', 'tutorial', 30, 0],
+    ['fluid-lab', 'Fluid Mechanics Lab', 'lab', 24, 0]
+  ];
+  const insPlace = db.prepare(
+    `INSERT OR IGNORE INTO places (slug, name, kind, capacity, livecount_enabled) VALUES (?, ?, ?, ?, ?)`
+  );
+  places.forEach((p) => insPlace.run(...p));
+
+  // Demo lecturer
+  const lectHash = bcrypt.hashSync('LECT123', 10);
+  insertUser.run(
+    'lecturer@campusgrid.local',
+    lectHash,
+    'DR AINA RAHMAN',
+    null,
+    'LECT01',
+    null,
+    'lecturer'
+  );
+  const lecturer = db.prepare(`SELECT id FROM users WHERE matrix_id = 'LECT01'`).get();
+
+  const insTt = db.prepare(
+    `INSERT INTO class_timetable
+      (class_code, class_name, class_type, place_slug, lecturer_id, day_of_week, start_time, duration_minutes, active)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`
+  );
+  // duration: lecture/tutorial = 60, lab = 120
+  insTt.run('MECH201', 'Thermodynamics II', 'lecture', 'dk12', lecturer?.id || null, 4, '15:00', 60);
+  insTt.run('MATH102', 'Calculus II', 'tutorial', 'tutorial-t3', lecturer?.id || null, 4, '09:00', 60);
+  insTt.run('MECH210', 'Fluid Mechanics Lab', 'lab', 'fluid-lab', lecturer?.id || null, 4, '11:00', 120);
+
+  db.prepare(`INSERT INTO login_logs (user_id, matrix_id, role, ip, success) VALUES (?, ?, ?, ?, 1)`)
+    .run(sathId, 'A22DEMO001', 'student', '127.0.0.1');
 }
 
-module.exports = { db, initDb, seedDb, DB_PATH };
+/** Idempotent defaults for upgrades / existing DBs */
+function ensureHubDefaults() {
+  const places = [
+    ['cafeteria', 'Cafeteria', 'cafeteria', 200],
+    ['library', 'Main Library', 'library', 400],
+    ['counselling', 'Counselling Room', 'counselling', 8]
+  ];
+  const insPlace = db.prepare(
+    `INSERT OR IGNORE INTO places (slug, name, kind, capacity, livecount_enabled) VALUES (?, ?, ?, ?, 1)`
+  );
+  places.forEach((p) => insPlace.run(...p));
+
+  const lect = db.prepare(`SELECT id FROM users WHERE role = 'lecturer' OR upper(matrix_id) = 'LECT01'`).get();
+  if (!lect) {
+    const lectHash = bcrypt.hashSync('LECT123', 10);
+    try {
+      db.prepare(
+        `INSERT INTO users (email, password_hash, name, rfid_tag, matrix_id, face_file, role)
+         VALUES (?, ?, ?, ?, ?, ?, 'lecturer')`
+      ).run('lecturer@campusgrid.local', lectHash, 'DR AINA RAHMAN', null, 'LECT01', null);
+    } catch (_) { /* ignore */ }
+  }
+
+  const lectId = db.prepare(`SELECT id FROM users WHERE upper(matrix_id) = 'LECT01'`).get()?.id;
+  const ttCount = db.prepare('SELECT COUNT(*) AS c FROM class_timetable').get().c;
+  if (ttCount === 0 && lectId) {
+    const insTt = db.prepare(
+      `INSERT INTO class_timetable
+        (class_code, class_name, class_type, place_slug, lecturer_id, day_of_week, start_time, duration_minutes, active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`
+    );
+    insTt.run('MECH201', 'Thermodynamics II', 'lecture', 'dk12', lectId, 4, '15:00', 60);
+    insTt.run('MATH102', 'Calculus II', 'tutorial', 'tutorial-t3', lectId, 4, '09:00', 60);
+    insTt.run('MECH210', 'Fluid Mechanics Lab', 'lab', 'fluid-lab', lectId, 4, '11:00', 120);
+  }
+}
+
+module.exports = { db, initDb, seedDb, ensureHubDefaults, DB_PATH };

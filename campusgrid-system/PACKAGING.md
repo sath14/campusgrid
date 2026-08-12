@@ -37,9 +37,23 @@ Look for **IPv4 Address** under Wi‑Fi (example `192.168.1.5`).
 ### What you need installed
 
 1. **Node.js** (same as CampusGrid)
-2. **Android Studio** — https://developer.android.com/studio  
-   - During setup, install **Android SDK**, **SDK Platform**, **Android Virtual Device** (optional)
-3. A phone with **USB debugging** on, or use an emulator
+2. **JDK 25** (Temurin/OpenJDK 25) — required to run Gradle 9.1 for this APK project
+3. **Android Studio** or command-line Android SDK — https://developer.android.com/studio  
+   - Install **Android SDK**, **SDK Platform 36**, **Build-Tools 36**
+4. A phone with **USB debugging** on, or use an emulator
+
+### Fast path (CLI, JDK 25)
+
+```bash
+export JAVA_HOME=/path/to/jdk-25
+export ANDROID_HOME=/path/to/Android/Sdk
+cd clients/android
+./BUILD-APK.sh
+```
+
+APK output:
+
+`clients/android/android/app/build/outputs/apk/debug/app-debug.apk`
 
 ### Step 1 — Prepare the Capacitor project
 
@@ -57,52 +71,33 @@ npx cap add android
 npx cap sync android
 ```
 
-### Step 2 — Allow HTTP to the laptop (important)
+### Step 2 — Allow HTTP to the laptop (already done in repo)
 
-Android blocks plain `http://` unless you allow cleartext.
+The committed `android/` project already enables cleartext HTTP via:
 
-1. Copy this file:
+- `android/app/src/main/res/xml/network_security_config.xml`
+- `android:usesCleartextTraffic="true"` + `networkSecurityConfig` on `<application>`
+- `INTERNET` + `ACCESS_NETWORK_STATE` permissions
 
-`clients\android\network_security_config.xml`
-
-into:
-
-`clients\android\android\app\src\main\res\xml\network_security_config.xml`
-
-(Create the `xml` folder if missing.)
-
-2. Open:
-
-`clients\android\android\app\src\main\AndroidManifest.xml`
-
-Inside the `<application ...>` tag, add:
-
-```xml
-android:usesCleartextTraffic="true"
-android:networkSecurityConfig="@xml/network_security_config"
-```
-
-Also add internet permission if not already present (**before** `<application>`):
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-```
-
-### JDK note (Android Studio)
-
-This Android project uses **Gradle 9.1** + **AGP 8.12**, so **Gradle JDK 25** is supported.
-
-**Settings → Build Tools → Gradle → Gradle JDK** can be **25**, **jbr-17**, or **21**.
-
-If sync fails on an older Android Studio, update Android Studio, or temporarily pick **jbr-17**.
+If you regenerate the platform with `npx cap add android`, re-apply those settings (or re-copy `network_security_config.xml`).
 
 ### Step 3 — Open in Android Studio and build APK
+
+Gradle toolchain for this project:
+
+- **JDK 25**
+- **Gradle 9.1.0**
+- **Android Gradle Plugin 9.0.0**
+- **compileSdk / targetSdk 36**
+
+In Android Studio, set **Gradle JDK** to JDK 25 (Settings → Build → Build Tools → Gradle).
 
 ```bat
 cd clients\android
 npx cap open android
 ```
+
+Or build from the CLI with `BUILD-APK.sh` / `npm run build:apk`.
 
 In Android Studio:
 
