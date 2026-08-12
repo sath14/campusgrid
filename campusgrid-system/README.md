@@ -28,17 +28,13 @@ Demo student: **A22DEMO001 / A22DEMO001**
 | Piece | Role |
 |-------|------|
 | **Arduino Mega** (USB on master laptop) | **Main head** — RFID + rapid-tap integrity (+ laptop webcam via Python agent) |
-| **ESP32-S3** (+ RFID, optional USB webcam) | Extra doorway/place nodes, added over time |
-| **Master laptop** | Runs Node server, SQLite, admin, stores photos |
+| **ESP32-S3-CAM (OV2640)** | Doorway nodes with built-in camera + RFID → `edge/esp32-s3-cam/` |
+| **ESP32-C3 SuperMini + LCD** | Simple doors: Welcome + `MK-…` → `edge/esp32-c3-rfid-lcd/` |
+| **IR / ultrasonic** | Pathway busy / speed → `edge/esp32-pathway-sensors/` |
+| Classic ESP32-CAM AI-Thinker | Only if you have that old module → `edge/esp32-cam/` |
+| **Master laptop** | Node server, SQLite, admin, photo storage |
 
-ESP32 nodes are **plug-and-play**:
-
-1. Flash `edge/esp32-s3-usb-webcam/` (copy `config.h.example` → `config.h`, set Wi‑Fi + laptop IP)
-2. Read the ESP32 LAN IP from Serial
-3. **Admin → ESP32 devices → Add** name + **IP** + place slug
-4. Device pulls config from `GET /api/edge/device-config?ip=...` and posts taps to the server
-
-If the **webcam is missing**, taps still work — no headcount/photo until a camera is available.
+Full list: **SYSTEM_INVENTORY.md**
 
 ---
 
@@ -147,8 +143,9 @@ campusgrid-system/
 ├── edge/
 │   ├── arduino/            Main head (Mega)
 │   ├── agent/              USB RFID + webcam Python agent
-│   ├── esp32/              Older WiFi RFID sketch
-│   └── esp32-s3-usb-webcam/  Plug-and-play ESP32-S3 sketch
+│   ├── esp32/              RFID-only WiFi ESP32
+│   ├── esp32-cam/          ESP32-CAM + OV2640 (normal ESP32 + camera)
+│   └── esp32-s3-usb-webcam/  ESP32-S3 + optional USB webcam
 ├── clients/
 │   ├── android/            Capacitor APK (JDK 25)
 │   └── desktop/            Electron .exe

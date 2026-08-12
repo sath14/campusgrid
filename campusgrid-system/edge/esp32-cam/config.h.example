@@ -1,0 +1,33 @@
+#pragma once
+
+// Copy this file to config.h and edit
+
+#define WIFI_SSID       "YOUR_WIFI"
+#define WIFI_PASSWORD   "YOUR_PASSWORD"
+
+#define GATEWAY_HOST    "192.168.1.10"   // master laptop LAN IP
+#define GATEWAY_PORT    3000
+#define DEVICE_KEY      "campusgrid-edge-secret"
+
+// Used until Admin registers this board's IP
+#define DOORWAY_FALLBACK  "ESP32CAM-NEW"
+#define PLACE_FALLBACK    "library"
+
+/*
+ * RC522 on ESP32-CAM (AI-Thinker) — free GPIOs (avoid camera pins).
+ * Wire RC522 at 3.3V only (not 5V).
+ *
+ *   RC522    →  ESP32-CAM
+ *   SDA/SS   →  GPIO 12
+ *   SCK      →  GPIO 14
+ *   MOSI     →  GPIO 13
+ *   MISO     →  GPIO 15
+ *   RST      →  GPIO 2
+ *   3.3V     →  3.3V
+ *   GND      →  GND
+ */
+#define RC522_SS    12
+#define RC522_SCK   14
+#define RC522_MOSI  13
+#define RC522_MISO  15
+#define RC522_RST   2

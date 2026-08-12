@@ -1,0 +1,37 @@
+#pragma once
+
+#define WIFI_SSID       "YOUR_WIFI"
+#define WIFI_PASSWORD   "YOUR_PASSWORD"
+#define GATEWAY_HOST    "192.168.1.10"
+#define GATEWAY_PORT    3000
+#define DEVICE_KEY      "campusgrid-edge-secret"
+#define DOORWAY_FALLBACK  "S3CAM-NEW"
+#define PLACE_FALLBACK    "library"
+
+/* RC522 — pick free GPIOs on YOUR S3-CAM board (avoid camera pins) */
+#define RC522_SS    39
+#define RC522_SCK   36
+#define RC522_MOSI  35
+#define RC522_MISO  37
+#define RC522_RST   38
+
+/*
+ * Default: common ESP32-S3-CAM N16R8-style OV2640 pinout.
+ * XIAO ESP32S3 Sense uses different pins — see README.
+ */
+#define CAM_PWDN   -1
+#define CAM_RESET  -1
+#define CAM_XCLK   15
+#define CAM_SIOD   4
+#define CAM_SIOC   5
+#define CAM_Y9     16
+#define CAM_Y8     17
+#define CAM_Y7     18
+#define CAM_Y6     12
+#define CAM_Y5     10
+#define CAM_Y4     8
+#define CAM_Y3     9
+#define CAM_Y2     11
+#define CAM_VSYNC  6
+#define CAM_HREF   7
+#define CAM_PCLK   13

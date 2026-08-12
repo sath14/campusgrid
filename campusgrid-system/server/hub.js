@@ -215,7 +215,15 @@ function processEdgeTap(db, DATA_DIR, body) {
     session_id: session?.id || null,
     class_name: session?.class_name || null,
     ends_at: session?.ends_at || null,
-    photo_file: photoFile
+    photo_file: photoFile,
+    // For ESP32-C3 / LCD doorway displays
+    known: Boolean(user),
+    name: user?.name || null,
+    matrix_id: user?.matrix_id || null,
+    display_line: user
+      ? `Welcome ${user.name}`
+      : 'Unknown card',
+    matrix_line: user?.matrix_id ? `MK-${user.matrix_id}` : 'MK----------'
   };
 }
 
@@ -411,6 +419,70 @@ function registerHubRoutes(app, deps) {
     );
 
     res.status(201).json({ ok: true, place });
+  });
+
+  /** IR / ultrasonic pathway sensors → walkway pace + congestion */
+  app.post('/api/edge/pathway', edgeAuth, (req, res) => {
+    const slug = String(req.body.walkway_slug || req.body.slug || 'block-a-c').trim();
+    const speed = Number(req.body.speed_mps);
+    const crossings = Number(req.body.crossings_per_min);
+    const busy = String(req.body.busy_level || '').toLowerCase(); // low|medium|high
+
+    let pace = Number.isFinite(speed) ? speed : null;
+    if (pace == null && Number.isFinite(crossings)) {
+      // Heuristic: more crossings → slower effective walking pace
+      if (crossings >= 40) pace = 0.55;
+      else if (crossings >= 20) pace = 0.85;
+      else pace = 1.15;
+    }
+    if (pace == null) {
+      if (busy === 'high') pace = 0.55;
+      else if (busy === 'medium') pace = 0.85;
+      else pace = 1.15;
+    }
+
+    const status =
+      pace < 0.7 ? 'congested' : pace < 1.0 ? 'busy' : 'clear';
+
+    const existing = db.prepare('SELECT * FROM walkways WHERE slug = ?').get(slug);
+    if (existing) {
+      db.prepare(`UPDATE walkways SET pace = ?, status = ? WHERE slug = ?`).run(pace, status, slug);
+    } else {
+      db.prepare(
+        `INSERT INTO walkways (slug, name, pace, status) VALUES (?, ?, ?, ?)`
+      ).run(slug, req.body.name || slug, pace, status);
+    }
+
+    const row = db.prepare('SELECT * FROM walkways WHERE slug = ?').get(slug);
+    res.status(201).json({
+      ok: true,
+      walkway: row,
+      crossings_per_min: Number.isFinite(crossings) ? crossings : null,
+      busy_level: busy || status
+    });
+  });
+
+  /** Lookup card for LCD doorways (ESP32-C3 etc.) */
+  app.get('/api/edge/lookup', edgeAuth, (req, res) => {
+    const uid = String(req.query.uid || '').toUpperCase().replace(/[^0-9A-F]/g, '');
+    if (!uid) return res.status(400).json({ error: 'uid required' });
+    const user = db.prepare(
+      'SELECT id, name, matrix_id, rfid_tag, role FROM users WHERE upper(rfid_tag) = ?'
+    ).get(uid);
+    if (!user) {
+      return res.json({
+        known: false,
+        display_line: 'Unknown card',
+        matrix_line: 'MK----------'
+      });
+    }
+    res.json({
+      known: true,
+      name: user.name,
+      matrix_id: user.matrix_id,
+      display_line: `Welcome ${user.name}`,
+      matrix_line: `MK-${user.matrix_id}`
+    });
   });
 
   // ---- Places ----
